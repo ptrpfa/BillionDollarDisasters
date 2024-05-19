@@ -8,9 +8,13 @@
 
 ### Team
 ---
-<ins>P4 Group ?</ins>
-- Peter Febrianto Afandy (2200959)
-- ???
+<ins>P4 Group Oldlace</ins>
+- Oh Jia Wei, Darien (*2200607*)
+- Peter Febrianto Afandy (*2200959*)
+- Quek Joo Wee (*2201046*)
+- Desmond Loy Yong Kiat (*2201435*)
+- Rene Low Yi Xuan (*2202620*)
+- Phileo Teo Weihan (*2203179*)
 
 ### Overview
 ---
