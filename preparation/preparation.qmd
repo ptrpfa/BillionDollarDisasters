@@ -1,0 +1,34 @@
+---
+title: "CSC3107 Project"
+subtitle: "Data Preparation"
+author:
+  <u>P4 Group Oldlace</u> </br>
+  Oh Jia Wei, Darien (2200607) <br/>
+  Peter Febrianto Afandy (2200959) <br/>
+  Quek Joo Wee (2201046) <br/>
+  Desmond Loy Yong Kiat (2201435) <br/>
+  Rene Low Yi Xuan (2202620) <br/>
+  Phileo Teo Weihan (2203179)
+format: html
+---
+
+# Introduction
+This document contains the data engineering required to reconstruct and improve ???
+
+The code below requires the following packages:
+```{r}
+#| label: library
+#| message: false
+
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(zoo)
+```
+
+# Data Cleaning
+...
+
+# Conclusion
+
+The data are now ready for visualization. The next step will be to create a plot that will allow us to ...

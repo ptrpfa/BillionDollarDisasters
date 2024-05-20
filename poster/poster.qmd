@@ -1,0 +1,71 @@
+---
+title: Project Title
+format:
+  poster-typst: 
+    size: "33x23" # Approximately A1
+    poster-authors: "Oh Jia Wei, Darien, Peter Febrianto Afandy, Quek Joo Wee, Desmond Loy Yong Kiat, Rene Low Yi Xuan, Phileo Teo Weihan"
+    departments: "SIT-UoG Computing Science"
+    institution-logo: "./images/sit-logo.png"
+    footer-text: "CSC3107 Project"
+    footer-emails: "2200607, 2200959, 2201046, 2201435, 2202620, 2203179"
+execute:
+  echo: false
+knitr:
+  opts_chunk:
+    dev: svglite
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Execute data preparations and load graphics
+# library(knitr)
+# purl("../preparation/preparation.qmd")
+# source("../preparation/preparation.R")
+```
+
+
+# Introduction
+...
+
+# Previous Visualization
+...
+
+# Strengths
+*  ...
+*  ...
+
+# Suggested Improvements
+1. ...
+2. ...
+    
+    
+# Implementation
+## Data
+*  ...
+*  ...
+
+
+
+## Software
+We used the Quarto publication framework and the R programming language, along with the following third-party packages:
+
+*   *readxl* for data import
+*   *tidyverse* for data transformation, including *ggplot2* for visualization
+    based on the grammar of graphics
+*   *knitr* for dynamic document generation
+
+# Improved Visualization
+...
+```{r}
+#| label: fig-ggplot
+# Some code here
+```
+
+
+# Further Suggestions for Interactivity
+...
+
+# Conclusion
+...
