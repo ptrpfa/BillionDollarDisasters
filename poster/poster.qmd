@@ -6,7 +6,7 @@ format:
     poster-authors: "Oh Jia Wei, Darien, Peter Febrianto Afandy, Quek Joo Wee, Desmond Loy Yong Kiat, Rene Low Yi Xuan, Phileo Teo Weihan"
     departments: "SIT-UoG Computing Science"
     institution-logo: "./images/sit-logo.png"
-    footer-text: "CSC3107 Project"
+    footer-text: "CSC3107 Project (Team Oldlace)"
     footer-emails: "2200607, 2200959, 2201046, 2201435, 2202620, 2203179"
 execute:
   echo: false

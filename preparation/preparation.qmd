@@ -2,7 +2,7 @@
 title: "CSC3107 Project"
 subtitle: "Data Preparation"
 author:
-  <u>P4 Group Oldlace</u> </br>
+  <u>P4 Team Oldlace</u> </br>
   Oh Jia Wei, Darien (2200607) <br/>
   Peter Febrianto Afandy (2200959) <br/>
   Quek Joo Wee (2201046) <br/>

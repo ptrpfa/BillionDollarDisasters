@@ -8,7 +8,7 @@
 
 ### Team
 ---
-<ins>P4 Group Oldlace</ins>
+<ins>P4 Team Oldlace</ins>
 - Oh Jia Wei, Darien (*2200607*)
 - Peter Febrianto Afandy (*2200959*)
 - Quek Joo Wee (*2201046*)
