@@ -3,7 +3,7 @@ title: "CSC3107 Project"
 subtitle: "Data Preparation"
 author:
   <u>P4 Team Oldlace</u> </br>
-  Oh Jia Wei, Darien (2200607) <br/>
+  Oh Jia Wei Darien (2200607) <br/>
   Peter Febrianto Afandy (2200959) <br/>
   Quek Joo Wee (2201046) <br/>
   Desmond Loy Yong Kiat (2201435) <br/>
@@ -25,6 +25,13 @@ library(knitr)
 library(readxl)
 library(zoo)
 ```
+
+Load the dataset
+```{r}
+bdd <- read_csv("time-series-US-cost-1980-2024.csv", skip = 2)
+summary(bdd)
+```
+
 
 # Data Cleaning
 ...

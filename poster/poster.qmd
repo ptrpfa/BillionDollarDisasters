@@ -1,11 +1,11 @@
 ---
-title: Project Title
+title: Visualizing Billion-Dollar Disasters in the USA (1980–2024)
 format:
   poster-typst: 
     size: "33x23" # Approximately A1
-    poster-authors: "Oh Jia Wei, Darien, Peter Febrianto Afandy, Quek Joo Wee, Desmond Loy Yong Kiat, Rene Low Yi Xuan, Phileo Teo Weihan"
+    poster-authors: "Oh Jia Wei Darien, Peter Febrianto Afandy, Quek Joo Wee, Desmond Loy Yong Kiat, Rene Low Yi Xuan, Phileo Teo Weihan"
     departments: "SIT-UoG Computing Science"
-    institution-logo: "./images/sit-logo.png"
+    institution-logo: "images/sit-logo.png"
     footer-text: "CSC3107 Project (Team Oldlace)"
     footer-emails: "2200607, 2200959, 2201046, 2201435, 2202620, 2203179"
 execute:
@@ -20,9 +20,9 @@ knitr:
 #| include: false
 
 # Execute data preparations and load graphics
-# library(knitr)
-# purl("../preparation/preparation.qmd")
-# source("../preparation/preparation.R")
+library(knitr)
+purl("preparation.qmd")
+source("preparation.R")
 ```
 
 
@@ -30,7 +30,15 @@ knitr:
 ...
 
 # Previous Visualization
-...
+```{r}
+#| label: fig-bb-on-poster
+#| fig-cap: "Frequency and Estimated Costs of Billion-Dollar Disasters in the USA by year, published by Bloomberg."
+#| out-width: 100%
+
+include_graphics("images/bb_bdd_cropped.png")
+```
+
+[^dottle_climate_2023]: <https://www.bloomberg.com/graphics/2023-fema-disaster-relief-fund-extreme-weather-climate-aid>
 
 # Strengths
 *  ...
