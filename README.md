@@ -31,8 +31,6 @@
 ### Repository Structure
 ---
 ```
-/preparation (files for data preparation)
-
 /poster (files for final poster)
 
 README.md (this file)
