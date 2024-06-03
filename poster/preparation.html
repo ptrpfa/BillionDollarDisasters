@@ -106,7 +106,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>This document contains the data engineering required to reconstruct and improve the visualization by <span class="citation" data-cites="dottle_climate_2023">@dottle_climate_2023</span>, shown in <a href="#fig-bb" class="quarto-xref">Figure&nbsp;1</a>, depicting the frequency and estimated costs of Billion-Dollar Disasters (BDD) in the USA by year, between 1980 and 2024.</p>
+<p>This document contains the data engineering required to reconstruct and improve the visualization by <span class="citation" data-cites="dottle_climate_2023">@dottle_climate_2023</span>, shown in <a href="#fig-bb" class="quarto-xref">Figure&nbsp;1</a>, depicting the frequency and estimated costs of Billion-Dollar Disasters (BDDs) in the USA by year, between 1980 and 2024.</p>
 <p>The code below requires the following packages:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -129,12 +129,116 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 </div>
 </div>
 </section>
-<section id="data-cleaning" class="level1">
-<h1>Data Cleaning</h1>
+<section id="dataset" class="level1">
+<h1>Dataset</h1>
+<p>To conduct analysis on BDDs, two datasets published by the National Centers for Environmental Information (NCEI) of the United States of America were used <a href="#references">(NCEI, 2024)</a>. An additional dataset derived from the NCEI’s <a href="https://www.ncei.noaa.gov/access/billions/state-summary/US">website</a> via web scraping was also used to provide more contextual information on individual BDD events.</p>
+<p>A summary on these datasets is as follows:</p>
+<ol type="1">
+<li><code>events-US-1980-2024.csv</code>: This dataset contains information on BDDs in the USA from 1980 to 2024, organised by each individual event.</li>
+<li><code>time-series-US-cost-1980-2024.csv</code>: This dataset contains information on BDDs in the USA from 1980 to 2024, organised by year and category.</li>
+<li><code>additional-events-US-1980-2024.csv</code>: This dataset was derived from the NCEI’s <a href="https://www.ncei.noaa.gov/access/billions/state-summary/US">website</a> via web scraping and contains additional information on individual BDD events. It will be combined with the <code>events-US-1980-2024.csv</code> dataset to provide more context on each BDD event.</li>
+</ol>
+<p>Relevant columns for data processing and analysis on each of the three datasets include:</p>
+<ol type="1">
+<li><code>events-US-1980-2024.csv</code>
+<ul>
+<li><code>Name</code>: Name of the disaster event</li>
+<li><code>Disaster</code>: Type of disaster that occurred</li>
+<li><code>Begin Date</code>: Start date of disaster event (formatted as yyyymmdd)</li>
+<li><code>End Date</code>: End date of disaster event (formatted as yyyymmdd)</li>
+<li><code>CPI-Adjusted Cost</code>: The cost of the disaster event, adjusted for CPI (Consumer Price Index) over the years</li>
+<li><code>Unadjusted Cost</code>: The unadjusted cost of the disaster event</li>
+<li><code>Deaths</code>: Number of deaths caused by the disaster event</li>
+</ul></li>
+<li><code>time-series-US-cost-1980-2024.csv</code>
+<ul>
+<li><code>State</code>: US State (deprecated)</li>
+<li><code>Year</code>: Year</li>
+<li><code>Drought Count</code>: Total drought events for the year</li>
+<li><code>Drought Cost</code>: Total cost of drought events for the year</li>
+<li><code>Drought Lower 75</code><sup>1</sup>: Total estimated lower cost of drought events for the year (75% confidence interval probability)</li>
+<li><code>Drought Upper 75</code><sup>1</sup>: Total estimated upper cost of drought events for the year (75% confidence interval probability)</li>
+<li><code>Drought Lower 90</code><sup>1</sup>: Total estimated lower cost of drought events for the year (90% confidence interval probability)</li>
+<li><code>Drought Upper 90</code><sup>1</sup>: Total estimated upper cost of drought events for the year (90% confidence interval probability)</li>
+<li><code>Drought Lower 95</code><sup>1</sup>: Total estimated lower cost of drought events for the year (95% confidence interval probability)</li>
+<li><code>Drought Upper 95</code><sup>1</sup>: Total estimated upper cost of drought events for the year (95% confidence interval probability)</li>
+<li><code>Flooding Count</code>: Total flooding events for the year</li>
+<li><code>Flooding Cost</code>: Total cost of flooding events for the year</li>
+<li><code>Flooding Lower 75</code><sup>1</sup>: Total estimated lower cost of flooding events for the year (75% confidence interval probability)</li>
+<li><code>Flooding Upper 75</code><sup>1</sup>: Total estimated upper cost of flooding events for the year (75% confidence interval probability)</li>
+<li><code>Flooding Lower 90</code><sup>1</sup>: Total estimated lower cost of flooding events for the year (90% confidence interval probability)</li>
+<li><code>Flooding Upper 90</code><sup>1</sup>: Total estimated upper cost of flooding events for the year (90% confidence interval probability)</li>
+<li><code>Flooding Lower 95</code><sup>1</sup>: Total estimated lower cost of flooding events for the year (95% confidence interval probability)</li>
+<li><code>Flooding Upper 95</code><sup>1</sup>: Total estimated upper cost of flooding events for the year (95% confidence interval probability)</li>
+<li><code>Freeze Count</code>: Total freeze events for the year</li>
+<li><code>Freeze Cost</code>: Total cost of freeze events for the year</li>
+<li><code>Freeze Lower 75</code><sup>1</sup>: Total estimated lower cost of freeze events for the year (75% confidence interval probability)</li>
+<li><code>Freeze Upper 75</code><sup>1</sup>: Total estimated upper cost of freeze events for the year (75% confidence interval probability)</li>
+<li><code>Freeze Lower 90</code><sup>1</sup>: Total estimated lower cost of freeze events for the year (90% confidence interval probability)</li>
+<li><code>Freeze Upper 90</code><sup>1</sup>: Total estimated upper cost of freeze events for the year (90% confidence interval probability)</li>
+<li><code>Freeze Lower 95</code><sup>1</sup>: Total estimated lower cost of freeze events for the year (95% confidence interval probability)</li>
+<li><code>Freeze Upper 95</code><sup>1</sup>: Total estimated upper cost of freeze events for the year (95% confidence interval probability)</li>
+<li><code>Severe Storm Count</code>: Total severe storm events for the year</li>
+<li><code>Severe Storm Cost</code>: Total cost of severe storm events for the year</li>
+<li><code>Severe Storm Lower 75</code><sup>1</sup>: Total estimated lower cost of severe storm events for the year (75% confidence interval probability)</li>
+<li><code>Severe Storm Upper 75</code><sup>1</sup>: Total estimated upper cost of severe storm events for the year (75% confidence interval probability)</li>
+<li><code>Severe Storm Lower 90</code><sup>1</sup>: Total estimated lower cost of severe storm events for the year (90% confidence interval probability)</li>
+<li><code>Severe Storm Upper 90</code><sup>1</sup>: Total estimated upper cost of severe storm events for the year (90% confidence interval probability)</li>
+<li><code>Severe Storm Lower 95</code><sup>1</sup>: Total estimated lower cost of severe storm events for the year (95% confidence interval probability)</li>
+<li><code>Severe Storm Upper 95</code><sup>1</sup>: Total estimated upper cost of severe storm events for the year (95% confidence interval probability)</li>
+<li><code>Tropical Cyclone Count</code>: Total tropical cyclone events for the year</li>
+<li><code>Tropical Cyclone Cost</code>: Total cost of tropical cyclone events for the year</li>
+<li><code>Tropical Cyclone Lower 75</code><sup>1</sup>: Total estimated lower cost of tropical cyclone events for the year (75% confidence interval probability)</li>
+<li><code>Tropical Cyclone Upper 75</code><sup>1</sup>: Total estimated upper cost of tropical cyclone events for the year (75% confidence interval probability)</li>
+<li><code>Tropical Cyclone Lower 90</code><sup>1</sup>: Total estimated lower cost of tropical cyclone events for the year (90% confidence interval probability)</li>
+<li><code>Tropical Cyclone Upper 90</code><sup>1</sup>: Total estimated upper cost of tropical cyclone events for the year (90% confidence interval probability)</li>
+<li><code>Tropical Cyclone Lower 95</code><sup>1</sup>: Total estimated lower cost of tropical cyclone events for the year (95% confidence interval probability)</li>
+<li><code>Tropical Cyclone Upper 95</code><sup>1</sup>: Total estimated upper cost of tropical cyclone events for the year (95% confidence interval probability)</li>
+<li><code>Wildfire Count</code>: Total wildfire events for the year</li>
+<li><code>Wildfire Cost</code>: Total cost of wildfire events for the year</li>
+<li><code>Wildfire Lower 75</code><sup>1</sup>: Total estimated lower cost of wildfire events for the year (75% confidence interval probability)</li>
+<li><code>Wildfire Upper 75</code><sup>1</sup>: Total estimated upper cost of wildfire events for the year (75% confidence interval probability)</li>
+<li><code>Wildfire Lower 90</code><sup>1</sup>: Total estimated lower cost of wildfire events for the year (90% confidence interval probability)</li>
+<li><code>Wildfire Upper 90</code><sup>1</sup>: Total estimated upper cost of wildfire events for the year (90% confidence interval probability)</li>
+<li><code>Wildfire Lower 95</code><sup>1</sup>: Total estimated lower cost of wildfire events for the year (95% confidence interval probability)</li>
+<li><code>Wildfire Upper 95</code><sup>1</sup>: Total estimated upper cost of wildfire events for the year (95% confidence interval probability)</li>
+<li><code>Winter Storm Count</code>: Total winter storm events for the year</li>
+<li><code>Winter Storm Cost</code>: Total cost of winter storm events for the year</li>
+<li><code>Winter Storm Lower 75</code><sup>1</sup>: Total estimated lower cost of winter storm events for the year (75% confidence interval probability)</li>
+<li><code>Winter Storm Upper 75</code><sup>1</sup>: Total estimated upper cost of winter storm events for the year (75% confidence interval probability)</li>
+<li><code>Winter Storm Lower 90</code><sup>1</sup>: Total estimated lower cost of winter storm events for the year (90% confidence interval probability)</li>
+<li><code>Winter Storm Upper 90</code><sup>1</sup>: Total estimated upper cost of winter storm events for the year (90% confidence interval probability)</li>
+<li><code>Winter Storm Lower 95</code><sup>1</sup>: Total estimated lower cost of winter storm events for the year (95% confidence interval probability)</li>
+<li><code>Winter Storm Upper 95</code><sup>1</sup>: Total estimated upper cost of winter storm events for the year (95% confidence interval probability)</li>
+<li><code>All Disasters Count</code>: Total disaster events for the year</li>
+<li><code>All Disasters Cost</code>: Total cost of all disaster events for the year</li>
+<li><code>All Disasters Lower 75</code><sup>1</sup>: Total estimated lower cost of all disaster events for the year (75% confidence interval probability)</li>
+<li><code>All Disasters Upper 75</code><sup>1</sup>: Total estimated upper cost of all disaster events for the year (75% confidence interval probability)</li>
+<li><code>All Disasters Lower 90</code><sup>1</sup>: Total estimated lower cost of all disaster events for the year (90% confidence interval probability)</li>
+<li><code>All Disasters Upper 90</code><sup>1</sup>: Total estimated upper cost of all disaster events for the year (90% confidence interval probability)</li>
+<li><code>All Disasters Lower 95</code><sup>1</sup>: Total estimated lower cost of all disaster events for the year (95% confidence interval probability)</li>
+<li><code>All Disasters Upper 95</code><sup>1</sup>: Total estimated upper cost of all disaster events for the year (95% confidence interval probability)</li>
+</ul></li>
+<li><code>additional-events-US-1980-2024.csv</code>
+<ul>
+<li><code>Name</code>: Name of the disaster event</li>
+<li><code>Disaster</code>: Type of disaster that occurred</li>
+<li><code>Begin Date</code>: Start date of disaster event (formatted as yyyymmdd)</li>
+<li><code>End Date</code>: End date of disaster event (formatted as yyyymmdd)</li>
+<li><code>Summary</code>: Description of disaster event</li>
+<li><code>CPI-Adjusted Cost</code>: The cost of the disaster event, adjusted for CPI (Consumer Price Index) over the years</li>
+<li><code>Unadjusted Cost</code>: The unadjusted cost of the disaster event</li>
+<li><code>Deaths</code>: Number of deaths caused by the disaster event</li>
+</ul></li>
+</ol>
+<p><sup>1</sup>Confidence Interval (CI) probabilities represent the uncertainty associated with the particular BDD event cost estimates, after Monte Carlo simulations were performed <a href="#references">(Smith &amp; Matthews, 2015)</a>.</p>
+</section>
+<section id="exploratory-data-analysis" class="level1">
+<h1>Exploratory Data Analysis</h1>
 <p>Load the dataset from <code>time-series-US-cost-1980-2024.csv</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>bdd <span class="ot">&lt;-</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(<span class="st">"time-series-US-cost-1980-2024.csv"</span>, <span class="at">skip =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(<span class="st">"data/time-series-US-cost-1980-2024.csv"</span>, <span class="at">skip =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">matches</span>(<span class="st">"^[^0-9]*$"</span>))  </span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>bdd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -172,9 +276,20 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 </div>
 </div>
 </section>
+<section id="data-cleaning" class="level1">
+<h1>Data Cleaning</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># something here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
 <p>The data are now ready for visualization. The next step will be to create a plot that will allow us to …</p>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<p>NOAA National Centers for Environmental Information (NCEI) U.S. Billion-Dollar Weather and Climate Disasters (2024). https://www.ncei.noaa.gov/access/billions/, DOI: <a href="https://www.doi.org/10.25921/stkw-7w73">10.25921/stkw-7w73</a>. Accessed [1 June 2024].</p>
+<p>Smith, A., and J. Matthews, 2015: Quantifying Uncertainty and Variable Sensitivity within the U.S. Billion-dollar Weather and Climate Disaster Cost Estimates. Natural Hazards., DOI: <a href="https://link.springer.com/article/10.1007/s11069-015-1678-x">10.1007/s11069-015-1678-x</a>. Accessed [1 June 2024].</p>
 </section>
 
 </main>
