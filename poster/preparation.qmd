@@ -162,23 +162,23 @@ colnames(bdd_additional_events)
 #| label: data-cleaning
 
 # Convert datatype of Begin Date and End Date to dates
-bdd_base_events <- mutate(bdd_base_events, 
-                          `Begin Date` = ymd(`Begin Date`),
-                          `End Date` = ymd(`End Date`),
-                          `Begin Date` = format(`Begin Date`, "%d/%m/%Y"),
-                          `End Date` = format(`End Date`, "%d/%m/%Y"),
-                          `Begin Date` = dmy(`Begin Date`),
-                          `End Date` = dmy(`End Date`)
-                          )
+bdd_base_events <- bdd_base_events |> 
+    mutate(`Begin Date` = ymd(`Begin Date`),
+           `End Date` = ymd(`End Date`),
+           `Begin Date` = format(`Begin Date`, "%d/%m/%Y"),
+           `End Date` = format(`End Date`, "%d/%m/%Y"),
+           `Begin Date` = dmy(`Begin Date`),
+           `End Date` = dmy(`End Date`)
+           )
 bdd_base_events
 
 # Convert datatype of Begin Date and End Date to dates
-bdd_additional_events <- mutate(bdd_additional_events,
-                                `Begin Date` = dmy(`Begin Date`),
-                                `End Date` = dmy(`End Date`),
-                                `Begin Date` = as.Date(`Begin Date`, format = "%d/%m/%Y"),
-                                `End Date` = as.Date(`End Date`, format = "%d/%m/%Y")
-                                )
+bdd_additional_events <- bdd_additional_events |> 
+  mutate(`Begin Date` = dmy(`Begin Date`),
+         `End Date` = dmy(`End Date`),
+         `Begin Date` = as.Date(`Begin Date`, format = "%d/%m/%Y"),
+         `End Date` = as.Date(`End Date`, format = "%d/%m/%Y")
+         )
 bdd_additional_events
 
 # Get subset of additional information to be added to the base events tibble
@@ -186,16 +186,14 @@ subset_bdd_additional_events <- select(bdd_additional_events, Name, `Begin Date`
 subset_bdd_additional_events
 
 # Combine events dataset with additional events dataset
-bdd_events <- left_join(bdd_base_events, 
-                        subset_bdd_additional_events, 
-                        by = c("Name", "Begin Date", "End Date")
-                        )
+bdd_events <- bdd_base_events |> 
+  left_join(subset_bdd_additional_events, by = c("Name", "Begin Date", "End Date")) |> 
+  mutate(Year = year(`Begin Date`))
 bdd_events
 
 # Export combined dataset into CSV
 write_csv(bdd_events, "data/combined_events.csv")
 ```
-
 
 # Conclusion
 The data are now ready for visualization. The next step will be to create a plot that will allow us to ...
