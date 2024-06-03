@@ -235,12 +235,12 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 </section>
 <section id="exploratory-data-analysis" class="level1">
 <h1>Exploratory Data Analysis</h1>
-<p>Load the dataset from <code>time-series-US-cost-1980-2024.csv</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>bdd <span class="ot">&lt;-</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(<span class="st">"data/time-series-US-cost-1980-2024.csv"</span>, <span class="at">skip =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">matches</span>(<span class="st">"^[^0-9]*$"</span>))  </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>bdd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load time-series dataset</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>bdd_time_series <span class="ot">&lt;-</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(<span class="st">"data/time-series-US-cost-1980-2024.csv"</span>, <span class="at">skip =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">matches</span>(<span class="st">"^[^0-9]*$"</span>))  </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>bdd_time_series</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 45 × 18
    State  Year `Drought Count` `Drought Cost` `Flooding Count` `Flooding Cost`
@@ -263,9 +263,7 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 #   `Winter Storm Cost` &lt;dbl&gt;, `All Disasters Count` &lt;dbl&gt;,
 #   `All Disasters Cost` &lt;dbl&gt;</code></pre>
 </div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bdd)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bdd_time_series)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "State"                  "Year"                   "Drought Count"         
  [4] "Drought Cost"           "Flooding Count"         "Flooding Cost"         
@@ -274,12 +272,157 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 [13] "Wildfire Count"         "Wildfire Cost"          "Winter Storm Count"    
 [16] "Winter Storm Cost"      "All Disasters Count"    "All Disasters Cost"    </code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load events dataset</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>bdd_base_events <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/events-US-1980-2024.csv"</span>, <span class="at">skip =</span> <span class="dv">2</span>) </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>bdd_base_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 383 × 7
+   Name   Disaster `Begin Date` `End Date` `CPI-Adjusted Cost` `Unadjusted Cost`
+   &lt;chr&gt;  &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;               &lt;dbl&gt;             &lt;dbl&gt;
+ 1 South… Flooding     19800410   19800417               2728.              707.
+ 2 Hurri… Tropica…     19800807   19800811               2213.              590 
+ 3 Centr… Drought      19800601   19801130              40180.            10020 
+ 4 Flori… Freeze       19810112   19810114               2054.              572 
+ 5 Sever… Severe …     19810505   19810510               1397               401.
+ 6 Midwe… Winter …     19820108   19820116               2191               662 
+ 7 Midwe… Severe …     19820402   19820404               1590.              483.
+ 8 Sever… Severe …     19820531   19820610               1564.              480.
+ 9 Gulf … Flooding     19821201   19830115               4900.             1536.
+10 Weste… Flooding     19821213   19830331               4784.             1500.
+# ℹ 373 more rows
+# ℹ 1 more variable: Deaths &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bdd_base_events)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Name"              "Disaster"          "Begin Date"       
+[4] "End Date"          "CPI-Adjusted Cost" "Unadjusted Cost"  
+[7] "Deaths"           </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load additional events dataset</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>bdd_additional_events <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/additional-events-US-1980-2024.csv"</span>) </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>bdd_additional_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 383 × 7
+   Name      Disaster `Begin Date` `End Date` Summary `CPI-Adjusted Cost` Deaths
+   &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;                 &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Southern… Severe … 08/04/2024   11/04/2024 Southe…                 1.5      0
+ 2 Central … Severe … 01/04/2024   03/04/2024 A cent…                 1.8      3
+ 3 Central … Severe … 13/03/2024   15/03/2024 Damagi…                 4.4      3
+ 4 Southern… Severe … 10/02/2024   12/02/2024 Severe…                 1.2      0
+ 5 Central … Winter … 14/01/2024   18/01/2024 A bitt…                 1.3     41
+ 6 Northwes… Winter … 12/01/2024   15/01/2024 A stro…                 1.1     20
+ 7 Southern… Severe … 08/01/2024   10/01/2024 Southe…                 2.7      3
+ 8 East Coa… Flooding 16/12/2023   18/12/2023 Powerf…                 1.3      5
+ 9 Southern… Drought  01/04/2023   30/09/2023 Drough…                14.6    247
+10 Southern… Severe … 23/09/2023   24/09/2023 Hail s…                 1.7      0
+# ℹ 373 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bdd_additional_events)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Name"              "Disaster"          "Begin Date"       
+[4] "End Date"          "Summary"           "CPI-Adjusted Cost"
+[7] "Deaths"           </code></pre>
+</div>
 </div>
 </section>
 <section id="data-cleaning" class="level1">
 <h1>Data Cleaning</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># something here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert datatype of Begin Date and End Date to dates</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>bdd_base_events <span class="ot">&lt;-</span> <span class="fu">mutate</span>(bdd_base_events, </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">ymd</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">ymd</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">"%d/%m/%Y"</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, <span class="st">"%d/%m/%Y"</span>),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                          )</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>bdd_base_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 383 × 7
+   Name   Disaster `Begin Date` `End Date` `CPI-Adjusted Cost` `Unadjusted Cost`
+   &lt;chr&gt;  &lt;chr&gt;    &lt;date&gt;       &lt;date&gt;                   &lt;dbl&gt;             &lt;dbl&gt;
+ 1 South… Flooding 1980-04-10   1980-04-17               2728.              707.
+ 2 Hurri… Tropica… 1980-08-07   1980-08-11               2213.              590 
+ 3 Centr… Drought  1980-06-01   1980-11-30              40180.            10020 
+ 4 Flori… Freeze   1981-01-12   1981-01-14               2054.              572 
+ 5 Sever… Severe … 1981-05-05   1981-05-10               1397               401.
+ 6 Midwe… Winter … 1982-01-08   1982-01-16               2191               662 
+ 7 Midwe… Severe … 1982-04-02   1982-04-04               1590.              483.
+ 8 Sever… Severe … 1982-05-31   1982-06-10               1564.              480.
+ 9 Gulf … Flooding 1982-12-01   1983-01-15               4900.             1536.
+10 Weste… Flooding 1982-12-13   1983-03-31               4784.             1500.
+# ℹ 373 more rows
+# ℹ 1 more variable: Deaths &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert datatype of Begin Date and End Date to dates</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>bdd_additional_events <span class="ot">&lt;-</span> <span class="fu">mutate</span>(bdd_additional_events,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                                <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                                <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                                <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="at">format =</span> <span class="st">"%d/%m/%Y"</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                                <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, <span class="at">format =</span> <span class="st">"%d/%m/%Y"</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                                )</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>bdd_additional_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 383 × 7
+   Name      Disaster `Begin Date` `End Date` Summary `CPI-Adjusted Cost` Deaths
+   &lt;chr&gt;     &lt;chr&gt;    &lt;date&gt;       &lt;date&gt;     &lt;chr&gt;                 &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Southern… Severe … 2024-04-08   2024-04-11 Southe…                 1.5      0
+ 2 Central … Severe … 2024-04-01   2024-04-03 A cent…                 1.8      3
+ 3 Central … Severe … 2024-03-13   2024-03-15 Damagi…                 4.4      3
+ 4 Southern… Severe … 2024-02-10   2024-02-12 Severe…                 1.2      0
+ 5 Central … Winter … 2024-01-14   2024-01-18 A bitt…                 1.3     41
+ 6 Northwes… Winter … 2024-01-12   2024-01-15 A stro…                 1.1     20
+ 7 Southern… Severe … 2024-01-08   2024-01-10 Southe…                 2.7      3
+ 8 East Coa… Flooding 2023-12-16   2023-12-18 Powerf…                 1.3      5
+ 9 Southern… Drought  2023-04-01   2023-09-30 Drough…                14.6    247
+10 Southern… Severe … 2023-09-23   2023-09-24 Hail s…                 1.7      0
+# ℹ 373 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get subset of additional information to be added to the base events tibble</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>subset_bdd_additional_events <span class="ot">&lt;-</span> <span class="fu">select</span>(bdd_additional_events, Name, <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, Summary)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>subset_bdd_additional_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 383 × 4
+   Name                                          `Begin Date` `End Date` Summary
+   &lt;chr&gt;                                         &lt;date&gt;       &lt;date&gt;     &lt;chr&gt;  
+ 1 Southern and Eastern Severe Weather (April 2… 2024-04-08   2024-04-11 Southe…
+ 2 Central Tornado Outbreak and Eastern Severe … 2024-04-01   2024-04-03 A cent…
+ 3 Central and Southern Severe Weather (March 2… 2024-03-13   2024-03-15 Damagi…
+ 4 Southern Severe Weather (February 2024)       2024-02-10   2024-02-12 Severe…
+ 5 Central and Southern Winter Storm and Cold W… 2024-01-14   2024-01-18 A bitt…
+ 6 Northwest Winter Storm (January 2024)         2024-01-12   2024-01-15 A stro…
+ 7 Southern Tornado Outbreak and East Coast Sto… 2024-01-08   2024-01-10 Southe…
+ 8 East Coast Storm and Flooding (December 2023) 2023-12-16   2023-12-18 Powerf…
+ 9 Southern/Midwestern Drought and Heatwave (Sp… 2023-04-01   2023-09-30 Drough…
+10 Southern Hail Storms (September 2023)         2023-09-23   2023-09-24 Hail s…
+# ℹ 373 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine events dataset with additional events dataset</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>bdd_events <span class="ot">&lt;-</span> <span class="fu">left_join</span>(bdd_base_events, </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                        subset_bdd_additional_events, </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Name"</span>, <span class="st">"Begin Date"</span>, <span class="st">"End Date"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                        )</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>bdd_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 383 × 8
+   Name   Disaster `Begin Date` `End Date` `CPI-Adjusted Cost` `Unadjusted Cost`
+   &lt;chr&gt;  &lt;chr&gt;    &lt;date&gt;       &lt;date&gt;                   &lt;dbl&gt;             &lt;dbl&gt;
+ 1 South… Flooding 1980-04-10   1980-04-17               2728.              707.
+ 2 Hurri… Tropica… 1980-08-07   1980-08-11               2213.              590 
+ 3 Centr… Drought  1980-06-01   1980-11-30              40180.            10020 
+ 4 Flori… Freeze   1981-01-12   1981-01-14               2054.              572 
+ 5 Sever… Severe … 1981-05-05   1981-05-10               1397               401.
+ 6 Midwe… Winter … 1982-01-08   1982-01-16               2191               662 
+ 7 Midwe… Severe … 1982-04-02   1982-04-04               1590.              483.
+ 8 Sever… Severe … 1982-05-31   1982-06-10               1564.              480.
+ 9 Gulf … Flooding 1982-12-01   1983-01-15               4900.             1536.
+10 Weste… Flooding 1982-12-13   1983-03-31               4784.             1500.
+# ℹ 373 more rows
+# ℹ 2 more variables: Deaths &lt;dbl&gt;, Summary &lt;chr&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export combined dataset into CSV</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(bdd_events, <span class="st">"data/combined_events.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="conclusion" class="level1">

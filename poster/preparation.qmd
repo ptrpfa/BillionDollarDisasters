@@ -135,27 +135,65 @@ Relevant columns for data processing and analysis on each of the three datasets 
 <sup>1</sup>Confidence Interval (CI) probabilities represent the uncertainty associated with the particular BDD event cost estimates, after Monte Carlo simulations were performed [(Smith & Matthews, 2015)](#references). 
 
 # Exploratory Data Analysis
-Load the dataset from `time-series-US-cost-1980-2024.csv`.
 ```{r}
-#| label: input-data
+#| label: data-loading
 #| message: false
 
-bdd <- 
+# Load time-series dataset
+bdd_time_series <- 
   read_csv("data/time-series-US-cost-1980-2024.csv", skip = 2) |> 
   select(matches("^[^0-9]*$"))  
-bdd
-```
+bdd_time_series
+colnames(bdd_time_series)
 
-```{r}
-colnames(bdd)
-```
+# Load events dataset
+bdd_base_events <- read_csv("data/events-US-1980-2024.csv", skip = 2) 
+bdd_base_events
+colnames(bdd_base_events)
 
+# Load additional events dataset
+bdd_additional_events <- read_csv("data/additional-events-US-1980-2024.csv") 
+bdd_additional_events
+colnames(bdd_additional_events)
+```
 
 # Data Cleaning
 ```{r}
 #| label: data-cleaning
 
-# something here
+# Convert datatype of Begin Date and End Date to dates
+bdd_base_events <- mutate(bdd_base_events, 
+                          `Begin Date` = ymd(`Begin Date`),
+                          `End Date` = ymd(`End Date`),
+                          `Begin Date` = format(`Begin Date`, "%d/%m/%Y"),
+                          `End Date` = format(`End Date`, "%d/%m/%Y"),
+                          `Begin Date` = dmy(`Begin Date`),
+                          `End Date` = dmy(`End Date`)
+                          )
+bdd_base_events
+
+# Convert datatype of Begin Date and End Date to dates
+bdd_additional_events <- mutate(bdd_additional_events,
+                                `Begin Date` = dmy(`Begin Date`),
+                                `End Date` = dmy(`End Date`),
+                                `Begin Date` = as.Date(`Begin Date`, format = "%d/%m/%Y"),
+                                `End Date` = as.Date(`End Date`, format = "%d/%m/%Y")
+                                )
+bdd_additional_events
+
+# Get subset of additional information to be added to the base events tibble
+subset_bdd_additional_events <- select(bdd_additional_events, Name, `Begin Date`, `End Date`, Summary)
+subset_bdd_additional_events
+
+# Combine events dataset with additional events dataset
+bdd_events <- left_join(bdd_base_events, 
+                        subset_bdd_additional_events, 
+                        by = c("Name", "Begin Date", "End Date")
+                        )
+bdd_events
+
+# Export combined dataset into CSV
+write_csv(bdd_events, "data/combined_events.csv")
 ```
 
 
