@@ -22,8 +22,6 @@ The code below requires the following packages:
 
 library(tidyverse)
 library(knitr)
-library(readxl)
-library(zoo)
 ```
 
 ```{r}

@@ -25,7 +25,6 @@ purl("preparation.qmd")
 source("preparation.R")
 ```
 
-
 # Introduction
 ...
 
@@ -54,21 +53,46 @@ include_graphics("images/bb_bdd_cropped.png")
 *  ...
 *  ...
 
-
-
 ## Software
 We used the Quarto publication framework and the R programming language, along with the following third-party packages:
 
-*   *readxl* for data import
 *   *tidyverse* for data transformation, including *ggplot2* for visualization
     based on the grammar of graphics
 *   *knitr* for dynamic document generation
 
 # Improved Visualization
-...
 ```{r}
 #| label: fig-ggplot
-# Some code here
+#| fig-width: 10
+#| fig-height: 8
+#| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar Disasters in the USA by year."
+
+bdd_cost |>
+  ggplot(aes(x = Year, y = Cost, color = Disaster)) +
+  geom_line() +
+  scale_color_brewer(palette = "Paired") +
+  labs(
+    x = "Year",
+    y = "Cost (CPI-Adjusted, Billion $USD)",
+    color = "Disaster Type",
+    title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
+    caption = "Source: NCEI (2024)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12),
+    legend.title = element_text(size = 12, margin = margin(r = 12)),
+    legend.text = element_text(size = 10),
+    axis.title = element_text(size = 14),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    axis.title.y = element_text(margin = margin(r = 20)),
+    axis.text = element_text(size = 12),
+    legend.position = "top"
+  ) +
+  scale_x_continuous(breaks = seq(min(bdd_cost$Year), max(bdd_cost$Year + 5), by = 5)) +
+  scale_y_continuous(breaks = seq(0, max(bdd_cost$Cost + 25), by = 25))
+
 ```
 
 
