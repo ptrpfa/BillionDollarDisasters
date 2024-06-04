@@ -247,29 +247,6 @@ bdd_events_frequency_cost <- bdd_events |>
 bdd_events_frequency_cost
 ```
 
-# Stacked Histogram
-```{r}
-#| label: stacked-histogram
-#| fig_width: 8
-#| fig_height: 6
-
-# Create a stacked histogram of the frequency USA
-# from 1980 to 2024
-
-hist <- ggplot(bdd_events_frequency_cost, aes(x = Year, y = `Frequency`, fill = Disaster)) +
-  ggtitle("Frequency and Estimated Costs of Billion-Dollar Disasters in the USA (1980-2024)") +
-  geom_bar(stat = "identity") +
-  labs(
-    x = "Year",
-    y = "Frequency of billion-dollar disaster",
-  ) +
-  theme_bw() +
-  theme(legend.position = "top", plot.title = element_text(hjust = 0.5)) +
-  scale_fill_brewer(palette = "Set3")
-
-hist
-```
-
 # Conclusion
 
 The data are now ready for visualization. The next step will be to create a plot that will allow us to visualise the frequency and estimated costs of Billion-Dollar Disasters in the USA from 1980 to 2024.
