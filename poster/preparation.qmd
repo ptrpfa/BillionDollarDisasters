@@ -140,26 +140,46 @@ Relevant columns for data processing and analysis on each of the three datasets 
 #| message: false
 
 # Load time-series dataset
-bdd_time_series <- 
-  read_csv("data/time-series-US-cost-1980-2024.csv", skip = 2) |> 
-  select(matches("^[^0-9]*$"))  
+bdd_time_series <- read_csv("data/time-series-US-cost-1980-2024.csv", skip = 2)
 bdd_time_series
-colnames(bdd_time_series)
 
 # Load events dataset
 bdd_base_events <- read_csv("data/events-US-1980-2024.csv", skip = 2) 
 bdd_base_events
-colnames(bdd_base_events)
 
 # Load additional events dataset
 bdd_additional_events <- read_csv("data/additional-events-US-1980-2024.csv") 
 bdd_additional_events
-colnames(bdd_additional_events)
 ```
 
 # Data Cleaning
+## Process Time Series Data
 ```{r}
-#| label: data-cleaning
+#| label: process-time-series-data
+
+# Remove unwanted columns from the time-series dataset
+bdd_time_series_cleaned <- bdd_time_series |> 
+  select(matches("^[^0-9]*$"), -`State`) 
+bdd_time_series_cleaned
+
+# Get cost of BDD events by year
+bdd_cost <- bdd_time_series_cleaned |> 
+  select(contains("Cost"), -matches("All"), Year) |>
+  rename_with(~ gsub(" Cost$", "", .x), contains("Cost")) |> 
+  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
+bdd_cost
+
+# Get frequency of BDD events by year
+bdd_frequency <- bdd_time_series_cleaned |> 
+  select(contains("Count"), -matches("All"), Year) |> 
+  rename_with(~ gsub(" Count$", "", .x), contains("Count")) |>
+  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count")
+bdd_frequency
+```
+
+## Process Events Data
+```{r}
+#| label: process-events-data
 
 # Convert datatype of Begin Date and End Date to dates
 bdd_base_events <- bdd_base_events |> 
@@ -170,7 +190,6 @@ bdd_base_events <- bdd_base_events |>
            `Begin Date` = dmy(`Begin Date`),
            `End Date` = dmy(`End Date`)
            )
-bdd_base_events
 
 # Convert datatype of Begin Date and End Date to dates
 bdd_additional_events <- bdd_additional_events |> 
@@ -179,7 +198,6 @@ bdd_additional_events <- bdd_additional_events |>
          `Begin Date` = as.Date(`Begin Date`, format = "%d/%m/%Y"),
          `End Date` = as.Date(`End Date`, format = "%d/%m/%Y")
          )
-bdd_additional_events
 
 # Get subset of additional information to be added to the base events tibble
 subset_bdd_additional_events <- select(bdd_additional_events, Name, `Begin Date`, `End Date`, Summary)
@@ -189,14 +207,26 @@ subset_bdd_additional_events
 bdd_events <- bdd_base_events |> 
   left_join(subset_bdd_additional_events, by = c("Name", "Begin Date", "End Date")) |> 
   mutate(Year = year(`Begin Date`))
-bdd_events
 
 # Export combined dataset into CSV
 write_csv(bdd_events, "data/combined_events.csv")
+
+bdd_events
+
+# Get frequency and costs of BDD events by year (same as bdd_events and bdd_frequency, but does not include categories with values = 0)
+bdd_events_frequency_cost <- bdd_events |> 
+  group_by(Year, Disaster) |> 
+  summarise(
+    Frequency = n(), 
+    `CPI-Adjusted Cost` = sum(`CPI-Adjusted Cost`, na.rm = TRUE), 
+    `Unadjusted Cost` = sum(`Unadjusted Cost`, na.rm = TRUE),
+    .groups = "drop"
+  )
+bdd_events_frequency_cost
 ```
 
 # Conclusion
-The data are now ready for visualization. The next step will be to create a plot that will allow us to ...
+The data are now ready for visualization. The next step will be to create a plot that will allow us to visualise the frequency and estimated costs of Billion-Dollar Disasters in the USA from 1980 to 2024.
 
 # References
 NOAA National Centers for Environmental Information (NCEI) U.S. Billion-Dollar Weather and Climate Disasters (2024). https://www.ncei.noaa.gov/access/billions/, DOI: [10.25921/stkw-7w73](https://www.doi.org/10.25921/stkw-7w73). Accessed [1 June 2024].
