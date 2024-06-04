@@ -107,16 +107,24 @@ bdd_cost |>
 # Create a stacked histogram of the frequency USA
 # from 1980 to 2024
 hist <- ggplot(bdd_events_frequency_cost, aes(x = Year, y = `Frequency`, fill = Disaster)) +
-  ggtitle("Frequency of Billion-Dollar Disasters in the USA (1980-2024)") +
   geom_bar(stat = "identity") +
   labs(
     x = "Year",
     y = "Frequency of billion-dollar disaster",
+    title = "Frequency of Billion-Dollar Disasters in the USA (1980-2024)",
+    caption = "Source: NCEI (2024)"
   ) +
   theme_bw() +
   theme(
     legend.position = "top",
-    plot.title = element_text(hjust = 0.5),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12),
+    legend.title = element_text(size = 12, margin = margin(r = 12)),
+    legend.text = element_text(size = 10),
+    axis.title = element_text(size = 14),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    axis.title.y = element_text(margin = margin(r = 20)),
+    axis.text = element_text(size = 12),
     panel.grid.major = element_line(color = "grey", size = 0.5),
     panel.grid.minor = element_blank()  # Hide minor grid lines
   ) +
