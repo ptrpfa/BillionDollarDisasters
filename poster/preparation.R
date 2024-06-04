@@ -47,12 +47,26 @@ bdd_cost <- bdd_time_series_cleaned |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
 bdd_cost
 
+# Get cost of BDD events by year, with sum of costs for all disasters
+bdd_cost_total <- bdd_time_series_cleaned |>
+  select(contains("Cost"), Year) |>
+  rename_with(~ gsub(" Cost$", "", .x), contains("Cost")) |>
+  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
+bdd_cost_total
+
 # Get frequency of BDD events by year
 bdd_frequency <- bdd_time_series_cleaned |>
   select(contains("Count"), -matches("All"), Year) |>
   rename_with(~ gsub(" Count$", "", .x), contains("Count")) |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count")
 bdd_frequency
+
+# Get frequency of BDD events by year, with sum of frequencies for all disasters
+bdd_frequency_total <- bdd_time_series_cleaned |>
+  select(contains("Count"), -matches("All"), Year) |>
+  rename_with(~ gsub(" Count$", "", .x), contains("Count")) |>
+  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count")
+bdd_frequency_total
 
 
 ## -----------------------------------------------------------------------------

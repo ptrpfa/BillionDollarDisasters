@@ -61,12 +61,14 @@ We used the Quarto publication framework and the R programming language, along w
 *   *knitr* for dynamic document generation
 
 # Improved Visualization
+## Estimated Costs of Billion-Dollar Disasters in the USA by Year
 ```{r}
 #| label: fig-ggplot
 #| fig-width: 10
 #| fig-height: 8
 #| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar Disasters in the USA by year."
 
+# Base plot
 bdd_cost |>
   ggplot(aes(x = Year, y = Cost, color = Disaster)) +
   geom_line() +
@@ -93,6 +95,16 @@ bdd_cost |>
   scale_x_continuous(breaks = seq(min(bdd_cost$Year), max(bdd_cost$Year + 5), by = 5)) +
   scale_y_continuous(breaks = seq(0, max(bdd_cost$Cost + 25), by = 25))
 
+```
+
+## Frequency of Billion-Dollar Disasters in the USA by Year
+```{r}
+# something here
+```
+
+## Combined Plot of Costs and Frequency
+```{r}
+# something here
 ```
 
 
