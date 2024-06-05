@@ -172,6 +172,17 @@ bdd_cost <- bdd_time_series_cleaned |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
 bdd_cost
 
+# Get sum of cost of BDD events by year
+bdd_cost_sum_by_year <- bdd_cost |> 
+  group_by(Year) |> 
+  summarise(TotalCost = sum(Cost, na.rm = TRUE))
+bdd_cost_sum_by_year
+
+# Add percentage cost of each disaster, as an intensive variable
+bdd_cost <- bdd_cost |> 
+  left_join(bdd_cost_sum_by_year, by = "Year") |> 
+  mutate(PercentageCost = (Cost / TotalCost) * 100)
+
 # Get cost of BDD events by year, with sum of costs for all disasters
 bdd_cost_total <- bdd_time_series_cleaned |>
   select(contains("Cost"), Year) |>
