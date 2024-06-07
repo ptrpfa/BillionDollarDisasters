@@ -92,8 +92,14 @@ bdd_cost |>
     axis.text = element_text(size = 12),
     legend.position = "top"
   ) +
-  scale_x_continuous(breaks = seq(min(bdd_cost$Year), max(bdd_cost$Year + 5), by = 5)) +
-  scale_y_continuous(breaks = seq(0, max(bdd_cost$Cost + 25), by = 25))
+  scale_x_continuous(breaks = seq(min(bdd_cost$Year),
+    max(bdd_cost$Year + 5),
+    by = 5
+  )) +
+  scale_y_continuous(breaks = seq(0,
+    max(bdd_cost$Cost + 25),
+    by = 25
+  ))
 
 # Base plot (with Percentage Cost as an intensive variable)
 bdd_cost |>
@@ -119,9 +125,11 @@ bdd_cost |>
     axis.text = element_text(size = 12),
     legend.position = "top"
   ) +
-  scale_x_continuous(breaks = seq(min(bdd_cost$Year), max(bdd_cost$Year + 5), by = 5)) +
+  scale_x_continuous(breaks = seq(min(bdd_cost$Year),
+    (bdd_cost$Year + 5),
+    by = 5
+  )) +
   scale_y_continuous(breaks = seq(0, max(bdd_cost$Cost), by = 5))
-
 ```
 
 ## Frequency of Billion-Dollar Disasters in the USA by Year
@@ -134,17 +142,34 @@ bdd_cost |>
 
 # Create custom color palette with distinct shades
 custom_palette <- c(
-  "Freeze" = "#1f78b4",       # Dark blue
+  "Wildfire" = "#fc9e87", # Light red
+  "Drought" = "#fb6a4a", # Dark red
+  "Freeze" = "#679ad2", # Dark blue
   "Winter Storm" = "#6baed6", # Medium blue
-  "Flooding" = "#a6cee3",     # Light blue
-  "Drought" = "#e31a1c",      # Dark red
-  "Wildfire" = "#fb6a4a",     # Light red
-  "Severe Storm" = "#ffa500", # Darker yellow (orange)
-  "Tropical Cyclone" = "#ff8c00" # Darker yellow (dark orange)
+  "Flooding" = "#a6cee3", # Light blue
+  "Severe Storm" = "#7DC15A", # Darker yellow (light Green)
+  "Tropical Cyclone" = "#C1F2B0" # Darker Green (dark Green)
+)
+
+bdd_events_frequency_cost$Disaster <- factor(
+  bdd_events_frequency_cost$Disaster,
+  levels = c(
+    "Wildfire",
+    "Drought",
+    "Flooding",
+    "Winter Storm",
+    "Freeze",
+    "Tropical Cyclone",
+    "Severe Storm"
+  )
 )
 
 # Create a stacked histogram of the frequency USA from 1980 to 2024
-bdd_events_frequency_cost |> ggplot(aes(x = Year, y = Frequency, fill = Disaster)) +
+bdd_events_frequency_cost |> ggplot(aes(
+  x = Year,
+  y = Frequency,
+  fill = Disaster
+)) +
   geom_bar(stat = "identity") +
   labs(
     x = "Year",
@@ -164,27 +189,41 @@ bdd_events_frequency_cost |> ggplot(aes(x = Year, y = Frequency, fill = Disaster
     axis.title.y = element_text(margin = margin(r = 20)),
     axis.text = element_text(size = 12),
     panel.grid.major = element_line(color = "grey", linewidth = 0.5),
-    panel.grid.minor = element_blank()  # Hide minor grid lines
+    panel.grid.minor = element_blank() # Hide minor grid lines
   ) +
   scale_fill_manual(
     values = custom_palette,
-    breaks = c("Drought", "Wildfire", "Freeze", "Winter Storm", "Flooding", "Severe Storm", "Tropical Cyclone"),
-    labels = c("Drought", "Wildfire", "Freeze", "Winter Storm", "Flooding", "Severe Storm", "Tropical Cyclone")
+    breaks = c(
+      "Severe Storm",
+      "Tropical Cyclone",
+      "Freeze",
+      "Winter Storm",
+      "Flooding",
+      "Drought",
+      "Wildfire"
+    ), labels = c(
+      "Severe Storm",
+      "Tropical Cyclone",
+      "Freeze",
+      "Winter Storm",
+      "Flooding",
+      "Drought",
+      "Wildfire"
+    )
+  ) +
+  scale_y_continuous(
+    breaks = seq(0, 30, by = 3), # Set breaks at intervals of 5
+    limits = c(0, 30) # Set Y-axis limits from 0 to 30
   ) +
   guides(
     fill = guide_legend(
-      title = "Disaster",  # Proper title without causing NULL
+      title = "Disaster", # Proper title without causing NULL
       title.position = "left",
       label.position = "right",
       keywidth = unit(1, "lines"), # Set key width to match desired format
       keyheight = unit(1, "lines") # Set key height to match desired format
     )
-  ) +
-  scale_y_continuous(
-    breaks = seq(0, 30, by = 5),  # Set breaks at intervals of 5
-    limits = c(0, 30)             # Set Y-axis limits from 0 to 30
   )
-
 ```
 
 
