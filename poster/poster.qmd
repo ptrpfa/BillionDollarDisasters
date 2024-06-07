@@ -26,7 +26,11 @@ source("preparation.R")
 ```
 
 # Introduction
-...
+<some intro and info on disaster relief fund being drained..>
+
+To highlight the need for enhanced disaster preparedness in the USA, Dottle and Kaufman[^dottle_climate_2023] presented a combined plot visualizing the total estimated costs by disaster type and the frequency of such events from 1980 to 2023. The plot demonstrated the increased frequency of various types of disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs. Coupled with the depletion of the country's Disaster Relief Fund (DRF), this elucidates the dire need for proactive preparations and mitigations to manage and address the growing threat of such disasters effectively.
+
+[^dottle_climate_2023]: Dottle, R., & Kaufman, L. (2023). Climate Disasters Drain US Emergency Fund, Adding to Government Shutdown Risk. Retrieved from https://www.bloomberg.com/graphics/2023-fema-disaster-relief-fund-extreme-weather-climate-aid/
 
 # Previous Visualization
 ```{r}
@@ -37,16 +41,14 @@ source("preparation.R")
 include_graphics("images/bb_bdd_cropped.png")
 ```
 
-[^dottle_climate_2023]: <https://www.bloomberg.com/graphics/2023-fema-disaster-relief-fund-extreme-weather-climate-aid>
-
 # Strengths
 *  ...
 *  ...
 
 # Suggested Improvements
-1. ...
-2. ...
-    
+1. *Split the visualisation into two separate plots* to better highlight the trends in frequency and costs of billion-dollar disasters.
+2. *Enhance the color palette* to improve readability and distinguish between different disaster types.
+3. *Group disaster types* together to provide a clearer overview of the data.
     
 # Implementation
 ## Data
