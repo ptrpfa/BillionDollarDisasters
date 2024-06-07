@@ -181,11 +181,12 @@ bdd_time_series
 ```{r}
 #| label: process-time-series-data-cost
 
-# Get cost of BDD events by year
+# Get cost of BDD events by year, and add disaster subcategory
 bdd_cost <- bdd_time_series |>
   select(contains("Cost"), -matches("All"), Year) |>
   rename_with(~ gsub(" Cost$", "", .x), contains("Cost")) |>
-  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
+  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost") |> 
+  mutate(Category = disaster_mapping[Disaster])
 bdd_cost
 
 # Get yearly cost of BDD events
@@ -212,11 +213,12 @@ bdd_cost_total
 ```{r}
 #| label: process-time-series-data-freq
 
-# Get frequency of BDD events by year
+# Get frequency of BDD events by year, and add disaster subcategory
 bdd_frequency <- bdd_time_series |>
   select(contains("Count"), -matches("All"), Year) |>
   rename_with(~ gsub(" Count$", "", .x), contains("Count")) |>
-  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count")
+  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count") |> 
+  mutate(Category = disaster_mapping[Disaster])
 bdd_frequency
 
 # Get frequency of BDD events by year, with sum of frequencies for all disasters
@@ -241,6 +243,14 @@ bdd_base_events <- bdd_base_events |>
     `Begin Date` = dmy(`Begin Date`),
     `End Date` = dmy(`End Date`)
   )
+
+# Add disaster subcategory to the base events
+bdd_base_events <- bdd_base_events |> 
+  mutate(Category = case_when(
+    Disaster %in% names(disaster_mapping) ~ disaster_mapping[Disaster],
+    TRUE ~ "Other"
+  ))
+bdd_base_events
 ```
 
 ### Additional Events
@@ -255,9 +265,17 @@ bdd_additional_events <- bdd_additional_events |>
     `End Date` = as.Date(`End Date`, format = "%d/%m/%Y")
   )
 
-# Get subset of additional information to be added to the base events tibble
+# Add disaster subcategory to the additional events
+bdd_additional_events <- bdd_additional_events |> 
+  mutate(Category = case_when(
+    Disaster %in% names(disaster_mapping) ~ disaster_mapping[Disaster],
+    TRUE ~ "Other"
+  ))
+bdd_additional_events
+
+# Prepare subset of additional information to be added to the base events tibble
 subset_bdd_additional_events <- bdd_additional_events |>
-  select(Name, `Begin Date`, `End Date`, Summary)
+  select(Name, `Begin Date`, `End Date`, Category, Summary)
 subset_bdd_additional_events
 ```
 
@@ -268,7 +286,7 @@ subset_bdd_additional_events
 # Combine events dataset with additional events dataset
 bdd_events <- bdd_base_events |>
   left_join(subset_bdd_additional_events,
-    by = c("Name", "Begin Date", "End Date")
+    by = c("Name", "Begin Date", "End Date", "Category")
   ) |>
   mutate(Year = year(`Begin Date`))
 bdd_events
@@ -292,7 +310,6 @@ bdd_events_frequency_cost <- bdd_events |>
   )
 bdd_events_frequency_cost
 ```
-
 
 # Conclusion
 The data are now ready for visualization. The next step will be to create a plot that will allow us to visualise the frequency and estimated costs of Billion-Dollar Disasters in the USA from 1980 to 2024.

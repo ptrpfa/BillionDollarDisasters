@@ -33,47 +33,70 @@ bdd_additional_events
 
 
 ## -----------------------------------------------------------------------------
+#| label: define-disaster-subcategories
+
+# Define mapping of disaster types into their respective subcategories
+disaster_mapping <- c(
+  "Severe Storm" = "Storms Events",
+  "Tropical Cyclone" = "Storm Events",
+  "Drought" = "Dry Weather Events",
+  "Wildfire" = "Dry Weather Events",
+  "Winter Storm" = "Wet Weather Events",
+  "Flooding" = "Wet Weather Events",
+  "Freeze" = "Wet Weather Events"
+)
+
+
+## -----------------------------------------------------------------------------
 #| label: process-time-series-data
 
 # Remove unwanted columns from the time-series dataset
-bdd_time_series_cleaned <- bdd_time_series |>
-  select(matches("^[^0-9]*$"), -`State`)
-bdd_time_series_cleaned
+bdd_time_series <- select(bdd_time_series, matches("^[^0-9]*$"), -`State`)
+bdd_time_series
+
+
+## -----------------------------------------------------------------------------
+#| label: process-time-series-data-cost
 
 # Get cost of BDD events by year
-bdd_cost <- bdd_time_series_cleaned |>
+bdd_cost <- bdd_time_series |>
   select(contains("Cost"), -matches("All"), Year) |>
   rename_with(~ gsub(" Cost$", "", .x), contains("Cost")) |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
 bdd_cost
 
-# Get sum of cost of BDD events by year
-bdd_cost_sum_by_year <- bdd_cost |> 
+# Get yearly cost of BDD events
+bdd_yearly_cost <- bdd_cost |> 
   group_by(Year) |> 
   summarise(TotalCost = sum(Cost, na.rm = TRUE))
-bdd_cost_sum_by_year
+bdd_yearly_cost
 
 # Add percentage cost of each disaster, as an intensive variable
 bdd_cost <- bdd_cost |> 
-  left_join(bdd_cost_sum_by_year, by = "Year") |> 
+  left_join(bdd_yearly_cost, by = "Year") |> 
   mutate(PercentageCost = (Cost / TotalCost) * 100)
+bdd_cost
 
 # Get cost of BDD events by year, with sum of costs for all disasters
-bdd_cost_total <- bdd_time_series_cleaned |>
+bdd_cost_total <- bdd_time_series |>
   select(contains("Cost"), Year) |>
   rename_with(~ gsub(" Cost$", "", .x), contains("Cost")) |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
 bdd_cost_total
 
+
+## -----------------------------------------------------------------------------
+#| label: process-time-series-data-freq
+
 # Get frequency of BDD events by year
-bdd_frequency <- bdd_time_series_cleaned |>
+bdd_frequency <- bdd_time_series |>
   select(contains("Count"), -matches("All"), Year) |>
   rename_with(~ gsub(" Count$", "", .x), contains("Count")) |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count")
 bdd_frequency
 
 # Get frequency of BDD events by year, with sum of frequencies for all disasters
-bdd_frequency_total <- bdd_time_series_cleaned |>
+bdd_frequency_total <- bdd_time_series |>
   select(contains("Count"), -matches("All"), Year) |>
   rename_with(~ gsub(" Count$", "", .x), contains("Count")) |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count")
@@ -81,7 +104,7 @@ bdd_frequency_total
 
 
 ## -----------------------------------------------------------------------------
-#| label: process-events-data
+#| label: process-base-events-data
 
 # Convert datatype of Begin Date and End Date to dates
 bdd_base_events <- bdd_base_events |>
@@ -92,6 +115,10 @@ bdd_base_events <- bdd_base_events |>
     `Begin Date` = dmy(`Begin Date`),
     `End Date` = dmy(`End Date`)
   )
+
+
+## -----------------------------------------------------------------------------
+#| label: process-additional-events-data
 
 # Convert datatype of Begin Date and End Date to dates
 bdd_additional_events <- bdd_additional_events |>
@@ -106,20 +133,26 @@ subset_bdd_additional_events <- bdd_additional_events |>
   select(Name, `Begin Date`, `End Date`, Summary)
 subset_bdd_additional_events
 
+
+## -----------------------------------------------------------------------------
+#| label: process-events-data
+
 # Combine events dataset with additional events dataset
 bdd_events <- bdd_base_events |>
   left_join(subset_bdd_additional_events,
     by = c("Name", "Begin Date", "End Date")
   ) |>
   mutate(Year = year(`Begin Date`))
+bdd_events
 
 # Export combined dataset into CSV
 write_csv(bdd_events, "data/combined_events.csv")
 
-bdd_events
 
-# Get frequency and costs of BDD events by year (same as bdd_events and
-# bdd_frequency, but does not include categories with values = 0)
+## -----------------------------------------------------------------------------
+#| label: process-combined-events-data
+
+# Get frequency and costs of BDD events by year (same as bdd_events and bdd_frequency, but does not include categories with values = 0)
 bdd_events_frequency_cost <- bdd_events |>
   group_by(Year, Disaster) |>
   summarise(
