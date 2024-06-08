@@ -4,6 +4,7 @@
 
 library(tidyverse)
 library(knitr)
+source("utils.R") # Custom utility functions and variables
 
 
 ## -----------------------------------------------------------------------------
@@ -33,21 +34,6 @@ bdd_additional_events
 
 
 ## -----------------------------------------------------------------------------
-#| label: define-disaster-subcategories
-
-# Define mapping of disaster types into their respective subcategories
-disaster_mapping <- c(
-  "Severe Storm" = "Storms Events",
-  "Tropical Cyclone" = "Storm Events",
-  "Drought" = "Dry Weather Events",
-  "Wildfire" = "Dry Weather Events",
-  "Winter Storm" = "Wet Weather Events",
-  "Flooding" = "Wet Weather Events",
-  "Freeze" = "Wet Weather Events"
-)
-
-
-## -----------------------------------------------------------------------------
 #| label: process-time-series-data
 
 # Remove unwanted columns from the time-series dataset
@@ -63,44 +49,48 @@ bdd_cost <- bdd_time_series |>
   select(contains("Cost"), -matches("All"), Year) |>
   rename_with(~ gsub(" Cost$", "", .x), contains("Cost")) |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
+
+# Add disaster subcategory, arrange and sort the dataset
+bdd_cost <- 
+  add_disaster_category(bdd_cost) |>
+  select(Year, Disaster, Category, Cost) |> 
+  arrange(Year, Category, Disaster)
 bdd_cost
 
 # Get yearly cost of BDD events
 bdd_yearly_cost <- bdd_cost |> 
   group_by(Year) |> 
-  summarise(TotalCost = sum(Cost, na.rm = TRUE))
+  summarise(YearlyCost = sum(Cost, na.rm = TRUE))
 bdd_yearly_cost
 
-# Add percentage cost of each disaster, as an intensive variable
+# Add percentage cost of each disaster, as an intensive variable for each year
 bdd_cost <- bdd_cost |> 
   left_join(bdd_yearly_cost, by = "Year") |> 
-  mutate(PercentageCost = (Cost / TotalCost) * 100)
+  mutate(PercentageCost = ifelse(YearlyCost == 0, 0, (Cost / YearlyCost) * 100))
 bdd_cost
 
-# Get cost of BDD events by year, with sum of costs for all disasters
-bdd_cost_total <- bdd_time_series |>
-  select(contains("Cost"), Year) |>
-  rename_with(~ gsub(" Cost$", "", .x), contains("Cost")) |>
-  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Cost")
-bdd_cost_total
+# Ensure that there are no missing values or categories
+verify_data(bdd_cost)
 
 
 ## -----------------------------------------------------------------------------
 #| label: process-time-series-data-freq
 
-# Get frequency of BDD events by year
+# Get frequency of BDD events by year, and add disaster subcategory
 bdd_frequency <- bdd_time_series |>
   select(contains("Count"), -matches("All"), Year) |>
   rename_with(~ gsub(" Count$", "", .x), contains("Count")) |>
   pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count")
+
+# Add disaster subcategory, arrange and sort the dataset
+bdd_frequency <- 
+  add_disaster_category(bdd_frequency) |>
+  select(Year, Disaster, Category, Count) |> 
+  arrange(Year, Category, Disaster)
 bdd_frequency
 
-# Get frequency of BDD events by year, with sum of frequencies for all disasters
-bdd_frequency_total <- bdd_time_series |>
-  select(contains("Count"), -matches("All"), Year) |>
-  rename_with(~ gsub(" Count$", "", .x), contains("Count")) |>
-  pivot_longer(cols = -Year, names_to = "Disaster", values_to = "Count")
-bdd_frequency_total
+# Ensure that there are no missing values or categories
+verify_data(bdd_frequency)
 
 
 ## -----------------------------------------------------------------------------
@@ -116,6 +106,10 @@ bdd_base_events <- bdd_base_events |>
     `End Date` = dmy(`End Date`)
   )
 
+# Add disaster subcategory to the base events
+bdd_base_events <- add_disaster_category(bdd_base_events)
+bdd_base_events
+
 
 ## -----------------------------------------------------------------------------
 #| label: process-additional-events-data
@@ -128,38 +122,50 @@ bdd_additional_events <- bdd_additional_events |>
     `End Date` = as.Date(`End Date`, format = "%d/%m/%Y")
   )
 
-# Get subset of additional information to be added to the base events tibble
-subset_bdd_additional_events <- bdd_additional_events |>
-  select(Name, `Begin Date`, `End Date`, Summary)
-subset_bdd_additional_events
+# Add disaster subcategory to the additional events, and select relevant columns
+bdd_additional_events <- 
+  add_disaster_category(bdd_additional_events) |> 
+  select(Name, `Begin Date`, `End Date`, Category, Summary)
+bdd_additional_events
 
 
 ## -----------------------------------------------------------------------------
 #| label: process-events-data
 
-# Combine events dataset with additional events dataset
+# Combine both events and additional events datasets
 bdd_events <- bdd_base_events |>
-  left_join(subset_bdd_additional_events,
-    by = c("Name", "Begin Date", "End Date")
-  ) |>
-  mutate(Year = year(`Begin Date`))
+  left_join(bdd_additional_events, by = c("Name", "Begin Date", "End Date", "Category")) |>
+  mutate(Year = year(`Begin Date`)) |> 
+  select(`Name`, `Disaster`, `Category`, `Deaths`, `Year`, `Begin Date`, `End Date`, `CPI-Adjusted Cost`, `Unadjusted Cost`, `Summary`) |> 
+  arrange(`Year`, `Begin Date`, `End Date`)
 bdd_events
 
+# Ensure that there are no missing values or categories
+verify_data(bdd_events)
+
 # Export combined dataset into CSV
-write_csv(bdd_events, "data/combined_events.csv")
+write_csv(bdd_events, "data/combined-events.csv")
 
 
 ## -----------------------------------------------------------------------------
 #| label: process-combined-events-data
 
-# Get frequency and costs of BDD events by year (same as bdd_events and bdd_frequency, but does not include categories with values = 0)
+# Get frequency and costs of BDD events by year
 bdd_events_frequency_cost <- bdd_events |>
   group_by(Year, Disaster) |>
   summarise(
-    Frequency = n(),
+    Count = n(),
     `CPI-Adjusted Cost` = sum(`CPI-Adjusted Cost`, na.rm = TRUE),
     `Unadjusted Cost` = sum(`Unadjusted Cost`, na.rm = TRUE),
     .groups = "drop"
-  )
+  ) |> 
+  mutate(Category = case_when(
+    Disaster %in% names(disaster_mapping) ~ disaster_mapping[Disaster],
+    TRUE ~ "Other"
+  )) |> 
+  select(`Year`, `Disaster`, `Category`, `Count`, `CPI-Adjusted Cost`, `Unadjusted Cost`)
 bdd_events_frequency_cost
+
+# Ensure that there are no missing values or categories
+verify_data(bdd_events_frequency_cost)
 

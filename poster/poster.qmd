@@ -169,7 +169,7 @@ bdd_events_frequency_cost$Disaster <- factor(
 # Create a stacked histogram of the frequency USA from 1980 to 2024
 bdd_events_frequency_cost |> ggplot(aes(
   x = Year,
-  y = Frequency,
+  y = Count,
   fill = Disaster
 )) +
   geom_bar(stat = "identity") +
