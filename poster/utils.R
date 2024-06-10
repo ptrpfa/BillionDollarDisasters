@@ -1,8 +1,9 @@
-# Utility functions and variables to support data processing for visualising Billion-Dollar Disasters
+# Utility functions and variables to support data processing for visualising
+# Billion-Dollar Disasters
 
 # Define custom mapping of disaster types into their respective subcategories
 disaster_mapping <- c(
-  "Severe Storm" = "Storms Events",
+  "Severe Storm" = "Storm Events",
   "Tropical Cyclone" = "Storm Events",
   "Drought" = "Dry Weather Events",
   "Wildfire" = "Dry Weather Events",
@@ -13,7 +14,7 @@ disaster_mapping <- c(
 
 # Function to add disaster subcategory
 add_disaster_category <- function(df) {
-  df <- df |> 
+  df <- df |>
     mutate(Category = case_when(
       Disaster %in% names(disaster_mapping) ~ disaster_mapping[Disaster],
       TRUE ~ "Other"
@@ -23,15 +24,14 @@ add_disaster_category <- function(df) {
 
 # Function to ensure dataframe provided is error free
 verify_data <- function(df) {
-  if(nrow(filter(df, Category == "Other")) == 0 && nrow(df[rowSums(is.na(df)) > 0, ]) == 0) {
+  if (nrow(filter(df, Category == "Other")) == 0
+      && nrow(df[rowSums(is.na(df)) > 0, ]) == 0) {
     message("Dataframe is error free")
-  } 
-  # Check if there are any rows with Category == "Other"
-  else if (!nrow(filter(df, Category == "Other")) == 0) {
+  } else if (!nrow(filter(df, Category == "Other")) == 0) {
+    # Check if there are any rows with Category == "Other"
     message("Dataframe has missing disaster subcategories")
-  } 
-  # Check if there are any rows with NA values
-  else if (!nrow(df[rowSums(is.na(df)) > 0, ]) == 0) {
+  } else if (!nrow(df[rowSums(is.na(df)) > 0, ]) == 0) {
+    # Check if there are any rows with NA values
     message("Dataframe has missing values")
   } else {
     message("Dataframe has missing values and disaster subcategories")

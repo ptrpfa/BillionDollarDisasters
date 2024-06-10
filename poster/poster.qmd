@@ -28,14 +28,15 @@ source("preparation.R")
 # Introduction
 <some intro and info on disaster relief fund being drained..>
 
-To highlight the need for enhanced disaster preparedness in the USA, Dottle and Kaufman[^dottle_climate_2023] presented a combined plot visualizing the total estimated costs by disaster type and the frequency of such events from 1980 to 2023. The plot demonstrated the increased frequency of various types of disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs. Coupled with the depletion of the country's Disaster Relief Fund (DRF), this elucidates the dire need for proactive preparations and mitigations to manage and address the growing threat of such disasters effectively.
+To highlight the need for enhanced disaster preparedness in the USA, Dottle and Kaufman[^dottle_climate_2023] presented a combined plot visualizing the total estimated costs by disaster type and the frequency of such events from 1980 to 2023. The plot demonstrated the increased frequency of various types of disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs. Coupled with the depletion of the country's Disaster Relief Fund (DRF), this elucidates the dire need for proactive preparations and mitigations to address the growing threat of such disasters effectively.
 
 [^dottle_climate_2023]: Dottle, R., & Kaufman, L. (2023). Climate Disasters Drain US Emergency Fund, Adding to Government Shutdown Risk. Retrieved from https://www.bloomberg.com/graphics/2023-fema-disaster-relief-fund-extreme-weather-climate-aid/
 
 # Previous Visualization
 ```{r}
 #| label: fig-bb-on-poster
-#| fig-cap: "Frequency and Estimated Costs of Billion-Dollar Disasters in the USA by year, published by Bloomberg."
+#| fig-cap: "Frequency and Estimated Costs of Billion-Dollar Disasters in
+#| the USA by year, published by Bloomberg."
 #| out-width: 100%
 
 include_graphics("images/bb_bdd_cropped.png")
@@ -68,13 +69,15 @@ We used the Quarto publication framework and the R programming language, along w
 #| label: fig-ggplot
 #| fig-width: 10
 #| fig-height: 8
-#| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar Disasters in the USA by year."
+#| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar
+#| Disasters in the USA by year."
 
 # Base plot
-bdd_cost |>
-  ggplot(aes(x = Year, y = Cost, color = Disaster)) +
+bdd_cost_plot <- bdd_category_cost |>
+  ggplot(aes(x = Year, y = Cost, color = Category, fill = Category)) +
+  geom_area(alpha = 0.4) +
   geom_line() +
-  scale_color_brewer(palette = "Paired") +
+  geom_point() +
   labs(
     x = "Year",
     y = "Cost (CPI-Adjusted, Billion $USD)",
@@ -94,23 +97,23 @@ bdd_cost |>
     axis.text = element_text(size = 12),
     legend.position = "top"
   ) +
-  scale_x_continuous(breaks = seq(min(bdd_cost$Year),
-    max(bdd_cost$Year + 5),
+  # scale_color_brewer(palette = "Paired") +
+  scale_x_continuous(breaks = seq(min(bdd_category_cost$Year),
+    max(bdd_category_cost$Year + 5),
     by = 5
   )) +
   scale_y_continuous(breaks = seq(0,
-    max(bdd_cost$Cost + 25),
+    max(bdd_category_cost$Cost + 25),
     by = 25
   ))
+bdd_cost_plot
 
-# Base plot (with Percentage Cost as an intensive variable)
-bdd_cost |>
-  ggplot(aes(x = Year, y = PercentageCost, color = Disaster)) +
-  geom_line() +
-  scale_color_brewer(palette = "Paired") +
+bdd_category_cost |>
+  ggplot(aes(x = Year, y = Cost, fill = Category)) +
+  geom_area(position = "stack", alpha = 0.6) +
   labs(
     x = "Year",
-    y = "Percentage Cost (CPI-Adjusted, Billion $USD)",
+    y = "Cost (CPI-Adjusted, Billion $USD)",
     color = "Disaster Type",
     title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
     caption = "Source: NCEI (2024)"
@@ -127,11 +130,15 @@ bdd_cost |>
     axis.text = element_text(size = 12),
     legend.position = "top"
   ) +
-  scale_x_continuous(breaks = seq(min(bdd_cost$Year),
-    max(bdd_cost$Year + 5),
+  scale_color_brewer(palette = "Paired") +
+  scale_x_continuous(breaks = seq(min(bdd_category_cost$Year),
+    max(bdd_category_cost$Year + 5),
     by = 5
   )) +
-  scale_y_continuous(breaks = seq(0, max(bdd_cost$Cost), by = 5))
+  scale_y_continuous(breaks = seq(0,
+    max(bdd_category_cost$Cost + 25),
+    by = 25
+  ))
 ```
 
 ## Frequency of Billion-Dollar Disasters in the USA by Year
@@ -139,10 +146,10 @@ bdd_cost |>
 #| label: fig-ggplot2
 #| fig-width: 10
 #| fig-height: 8
-#| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar Disasters in the USA by year."
+#| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar
+#| Disasters in the USA by year."
 
-
-# Create custom color palette with distinct shades
+# Create custom colour palette with distinct shades
 custom_palette <- c(
   "Wildfire" = "#fc9e87", # Light red
   "Drought" = "#fb6a4a", # Dark red
