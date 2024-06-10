@@ -58,34 +58,60 @@ bdd_cost <-
 bdd_cost
 
 # Get yearly cost of BDD events
-bdd_yearly_cost <- bdd_cost |> 
-  group_by(Year) |> 
+bdd_yearly_cost <- bdd_cost |>
+  group_by(Year) |>
   summarise(YearlyCost = sum(Cost, na.rm = TRUE))
 bdd_yearly_cost
 
 # Add percentage cost of each disaster, as an intensive variable for each year
-bdd_cost <- bdd_cost |> 
-  left_join(bdd_yearly_cost, by = "Year") |> 
+bdd_cost <- bdd_cost |>
+  left_join(bdd_yearly_cost, by = "Year") |>
   mutate(PercentageCost = ifelse(YearlyCost == 0, 0, (Cost / YearlyCost) * 100))
 bdd_cost
 
 # Ensure that there are no missing values or categories
 verify_data(bdd_cost)
 
-# Get cost of BDD disaster categories by year 
-bdd_category_cost <- bdd_cost |> 
+# Get cost of BDD disaster categories by year
+bdd_category_cost <- bdd_cost |>
   group_by(Year, Category) |>
-  summarise(Cost = sum(Cost, na.rm = TRUE), .groups = 'drop')
+  summarise(Cost = sum(Cost, na.rm = TRUE), .groups = "drop")
 bdd_category_cost
 
-# Add percentage cost of each disaster category, as an intensive variable for each year
-bdd_category_cost <- bdd_category_cost |> 
-  left_join(bdd_yearly_cost, by = "Year") |> 
+# Add percentage cost of each category, as an intensive variable for each year
+bdd_category_cost <- bdd_category_cost |>
+  left_join(bdd_yearly_cost, by = "Year") |>
   mutate(PercentageCost = ifelse(YearlyCost == 0, 0, (Cost / YearlyCost) * 100))
 bdd_category_cost
 
 # Ensure that there are no missing values or categories
 verify_data(bdd_category_cost)
+
+
+## -----------------------------------------------------------------------------
+#| label: process-time-series-data-cost-interval
+
+# Create a new column for 5-year intervals
+bdd_cost <- bdd_cost |> 
+  mutate(Interval = cut(Year, breaks = seq(1980, 2025, by = 5), right = FALSE, include.lowest = TRUE))
+
+# Group by the new interval, disaster, and category, then summarize the cost
+bdd_cost_summary <- bdd_cost |> 
+  group_by(Interval, Disaster, Category) |> 
+  summarize(Cost = sum(Cost, na.rm = TRUE), .groups = 'drop')
+
+# Convert Interval back to human-readable labels
+bdd_cost_summary <- bdd_cost_summary |> 
+  mutate(Year = as.numeric(sub("\\[(\\d+),.*", "\\1", as.character(Interval)))) |> 
+  select(Year, Disaster, Category, Cost)
+bdd_cost_summary
+
+# Get cost of BDD disaster categories by year
+bdd_category_cost_summary <- bdd_cost_summary |>
+  group_by(Year, Category) |>
+  summarise(Cost = sum(Cost, na.rm = TRUE), .groups = "drop")
+bdd_category_cost_summary
+
 
 
 ## -----------------------------------------------------------------------------
@@ -105,30 +131,32 @@ bdd_frequency <-
 bdd_frequency
 
 # Get yearly frequency of BDD events
-bdd_yearly_frequency <- bdd_frequency |> 
-  group_by(Year) |> 
+bdd_yearly_frequency <- bdd_frequency |>
+  group_by(Year) |>
   summarise(YearlyCount = sum(Count, na.rm = TRUE))
 bdd_yearly_frequency
 
-# Add percentage frequency of each disaster, as an intensive variable for each year
-bdd_frequency <- bdd_frequency |> 
-  left_join(bdd_yearly_frequency, by = "Year") |> 
-  mutate(PercentageCount = ifelse(YearlyCount == 0, 0, (Count / YearlyCount) * 100))
+# Add percentage freq of each disaster, as an intensive variable for each year
+bdd_frequency <- bdd_frequency |>
+  left_join(bdd_yearly_frequency, by = "Year") |>
+  mutate(PercentageCount = ifelse(YearlyCount == 0, 0,
+                                  (Count / YearlyCount) * 100))
 bdd_frequency
 
 # Ensure that there are no missing values or categories
 verify_data(bdd_frequency)
 
-# Get frequency of BDD disaster categories by year 
-bdd_category_frequency <- bdd_frequency |> 
+# Get frequency of BDD disaster categories by year
+bdd_category_frequency <- bdd_frequency |>
   group_by(Year, Category) |>
-  summarise(Count = sum(Count, na.rm = TRUE), .groups = 'drop')
+  summarise(Count = sum(Count, na.rm = TRUE), .groups = "drop")
 bdd_category_frequency
 
-# Add percentage frequency of each disaster category, as an intensive variable for each year
+# Add percentage frequency, as an intensive variable for each year
 bdd_category_frequency <- bdd_category_frequency |>
   left_join(bdd_yearly_frequency, by = "Year") |>
-  mutate(PercentageCount = ifelse(YearlyCount == 0, 0, (Count / YearlyCount) * 100))
+  mutate(PercentageCount = ifelse(YearlyCount == 0, 0,
+                                  (Count / YearlyCount) * 100))
 bdd_category_frequency
 
 # Ensure that there are no missing values or categories

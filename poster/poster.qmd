@@ -21,6 +21,7 @@ knitr:
 
 # Execute data preparations and load graphics
 library(knitr)
+library(scales)
 purl("preparation.qmd")
 source("preparation.R")
 ```
@@ -73,9 +74,8 @@ We used the Quarto publication framework and the R programming language, along w
 #| Disasters in the USA by year."
 
 # Base plot
-bdd_cost_plot <- bdd_category_cost |>
-  ggplot(aes(x = Year, y = Cost, color = Category, fill = Category)) +
-  geom_area(alpha = 0.4) +
+bdd_category_cost |>
+  ggplot(aes(x = Year, y = Cost, color = Category)) +
   geom_line() +
   geom_point() +
   labs(
@@ -106,8 +106,42 @@ bdd_cost_plot <- bdd_category_cost |>
     max(bdd_category_cost$Cost + 25),
     by = 25
   ))
-bdd_cost_plot
 
+# Grouped values by 5-year intervals
+bdd_category_cost_summary |>
+  ggplot(aes(x = Year, y = Cost, color = Category)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = "Year",
+    y = "Cost (CPI-Adjusted, Billion $USD)",
+    color = "Disaster Type",
+    title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
+    caption = "Source: NCEI (2024)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12),
+    legend.title = element_text(size = 12, margin = margin(r = 12)),
+    legend.text = element_text(size = 10),
+    axis.title = element_text(size = 14),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    axis.title.y = element_text(margin = margin(r = 20)),
+    axis.text = element_text(size = 12),
+    legend.position = "top"
+  ) +
+  # scale_color_brewer(palette = "Paired") +
+  scale_x_continuous(breaks = seq(min(bdd_category_cost_summary$Year),
+    max(bdd_category_cost_summary$Year + 5),
+    by = 5
+  )) +
+  scale_y_continuous(breaks = seq(0,
+    max(bdd_category_cost_summary$Cost + 100),
+    by = 100
+  ))
+
+# Stacked area plot
 bdd_category_cost |>
   ggplot(aes(x = Year, y = Cost, fill = Category)) +
   geom_area(position = "stack", alpha = 0.6) +
@@ -131,10 +165,9 @@ bdd_category_cost |>
     legend.position = "top"
   ) +
   scale_color_brewer(palette = "Paired") +
-  scale_x_continuous(breaks = seq(min(bdd_category_cost$Year),
-    max(bdd_category_cost$Year + 5),
-    by = 5
-  )) +
+  scale_x_continuous(
+    breaks = seq(min(bdd_category_cost$Year), max(bdd_category_cost$Year + 5), by = 5),
+    minor_breaks = NULL) +
   scale_y_continuous(breaks = seq(0,
     max(bdd_category_cost$Cost + 25),
     by = 25

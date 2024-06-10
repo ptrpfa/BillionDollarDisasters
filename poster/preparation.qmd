@@ -210,6 +210,32 @@ bdd_category_cost
 verify_data(bdd_category_cost)
 ```
 
+```{r}
+#| label: process-time-series-data-cost-interval
+
+# Create a new column for 5-year intervals
+bdd_cost <- bdd_cost |> 
+  mutate(Interval = cut(Year, breaks = seq(1980, 2025, by = 5), right = FALSE, include.lowest = TRUE))
+
+# Group by the new interval, disaster, and category, then summarize the cost
+bdd_cost_summary <- bdd_cost |> 
+  group_by(Interval, Disaster, Category) |> 
+  summarize(Cost = sum(Cost, na.rm = TRUE), .groups = 'drop')
+
+# Convert Interval back to human-readable labels
+bdd_cost_summary <- bdd_cost_summary |> 
+  mutate(Year = as.numeric(sub("\\[(\\d+),.*", "\\1", as.character(Interval)))) |> 
+  select(Year, Disaster, Category, Cost)
+bdd_cost_summary
+
+# Get cost of BDD disaster categories by year
+bdd_category_cost_summary <- bdd_cost_summary |>
+  group_by(Year, Category) |>
+  summarise(Cost = sum(Cost, na.rm = TRUE), .groups = "drop")
+bdd_category_cost_summary
+
+```
+
 ### Frequency of Billion Dollar Disasters
 ```{r}
 #| label: process-time-series-data-freq
