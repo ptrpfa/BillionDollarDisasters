@@ -107,6 +107,41 @@ bdd_category_cost |>
     by = 25
   ))
 
+# Base plot (cut-off extreme values)
+bdd_category_cost |>
+  ggplot(aes(x = Year, y = Cost, color = Category)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = "Year",
+    y = "Cost (CPI-Adjusted, Billion $USD)",
+    color = "Disaster Type",
+    title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
+    caption = "Source: NCEI (2024)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12),
+    legend.title = element_text(size = 12, margin = margin(r = 12)),
+    legend.text = element_text(size = 10),
+    axis.title = element_text(size = 14),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    axis.title.y = element_text(margin = margin(r = 20)),
+    axis.text = element_text(size = 12),
+    legend.position = "top"
+  ) +
+  # scale_color_brewer(palette = "Paired") +
+  scale_x_continuous(breaks = seq(min(bdd_category_cost$Year),
+    max(bdd_category_cost$Year + 5),
+    by = 5
+  )) +
+  scale_y_continuous(breaks = seq(0,
+    max(bdd_category_cost$Cost + 10),
+    by = 10
+  )) +
+  coord_cartesian(xlim = c(1980, 2024), ylim = c(0, 100))
+
 # Grouped values by 5-year intervals
 bdd_category_cost_summary |>
   ggplot(aes(x = Year, y = Cost, color = Category)) +
