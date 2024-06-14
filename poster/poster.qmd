@@ -227,7 +227,10 @@ custom_palette <- c(
   "Winter Storm" = "#6baed6", # Medium blue
   "Flooding" = "#a6cee3", # Light blue
   "Severe Storm" = "#7DC15A", # Darker yellow (light Green)
-  "Tropical Cyclone" = "#C1F2B0" # Darker Green (dark Green)
+  "Tropical Cyclone" = "#C1F2B0", # Darker Green (dark Green)
+  "Storm Events" = "#7DC15A", # Darker yellow (light Green)
+  "Wet Weather Events" = "#6baed6", # Darker Green (dark Green)
+  "Dry Weather Events" = "#fb6a4a" # Dark blue
 )
 
 bdd_events_frequency_cost$Disaster <- factor(
@@ -303,6 +306,69 @@ bdd_events_frequency_cost |> ggplot(aes(
       keyheight = unit(1, "lines") # Set key height to match desired format
     )
   )
+
+bdd_events_frequency_cost$Category <- factor(
+  bdd_events_frequency_cost$Category,
+  levels = c(
+    "Dry Weather Events",
+    "Wet Weather Events",
+    "Storm Events"
+  )
+)
+
+# Base plot
+bdd_3cat <- 
+  bdd_events_frequency_cost |>
+  ggplot(aes(x = Year, y = Count, fill = Category)) +
+  geom_bar(stat = "identity") +
+  labs(
+    x = "Year",
+    y = "Frequency of billion-dollar disaster",
+    title = "Frequency of Billion-Dollar Disasters in the USA (1980-2024)",
+    caption = "Source: NCEI (2024)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(size = 12),
+    legend.title = element_text(size = 12, margin = margin(r = 12)),
+    legend.text = element_text(size = 10),
+    legend.position = "top",
+    axis.title = element_text(size = 14),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    axis.title.y = element_text(margin = margin(r = 20)),
+    axis.text = element_text(size = 12),
+    panel.grid.major = element_line(color = "grey", linewidth = 0.5),
+    panel.grid.minor = element_blank() # Hide minor grid lines
+  )  +
+  scale_y_continuous(
+    breaks = seq(0, 30, by = 3), # Set breaks at intervals of 5
+    limits = c(0, 30) # Set Y-axis limits from 0 to 30
+  ) +
+  guides(
+    fill = guide_legend(
+      title = "Disaster", # Proper title without causing NULL
+      title.position = "left",
+      label.position = "right",
+      keywidth = unit(1, "lines"), # Set key width to match desired format
+      keyheight = unit(1, "lines") # Set key height to match desired format
+    )
+  ) +
+  scale_fill_manual(
+    values = custom_palette,
+    breaks = c(
+      "Storm Events",
+      "Wet Weather Events",
+      "Dry Weather Events"
+    ), labels = c(
+      "Storm Events",
+      "Wet Weather Events",
+      "Dry Weather Events"
+    )
+  )
+
+bdd_3cat
+
 ```
 
 
