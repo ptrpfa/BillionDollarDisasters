@@ -27,13 +27,15 @@ source("preparation.R")
 ```
 
 # Introduction
-<some intro and info on disaster relief fund being drained..>
 
-To highlight the need for enhanced disaster preparedness in the USA, Dottle and Kaufman[^dottle_climate_2023] presented a combined plot visualizing the total estimated costs by disaster type and the frequency of such events from 1980 to 2023. The plot demonstrated the increased frequency of various types of disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs. Coupled with the depletion of the country's Disaster Relief Fund (DRF), this elucidates the dire need for proactive preparations and mitigations to address the growing threat of such disasters effectively.
+\<some intro and info on disaster relief fund being drained..\>
 
-[^dottle_climate_2023]: Dottle, R., & Kaufman, L. (2023). Climate Disasters Drain US Emergency Fund, Adding to Government Shutdown Risk. Retrieved from https://www.bloomberg.com/graphics/2023-fema-disaster-relief-fund-extreme-weather-climate-aid/
+To highlight the need for enhanced disaster preparedness in the USA, Dottle and Kaufman[^1] presented a combined plot visualizing the total estimated costs by disaster type and the frequency of such events from 1980 to 2023. The plot demonstrated the increased frequency of various types of disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs. Coupled with the depletion of the country's Disaster Relief Fund (DRF), this elucidates the dire need for proactive preparations and mitigations to address the growing threat of such disasters effectively.
+
+[^1]: Dottle, R., & Kaufman, L. (2023). Climate Disasters Drain US Emergency Fund, Adding to Government Shutdown Risk. Retrieved from https://www.bloomberg.com/graphics/2023-fema-disaster-relief-fund-extreme-weather-climate-aid/
 
 # Previous Visualization
+
 ```{r}
 #| label: fig-bb-on-poster
 #| fig-cap: "Frequency and Estimated Costs of Billion-Dollar Disasters in
@@ -44,28 +46,35 @@ include_graphics("images/bb_bdd_cropped.png")
 ```
 
 # Strengths
-*  ...
-*  ...
+
+-   The graph includes a *dual-axis* representation of the frequency and costs of billion-dollar disasters, providing a comprehensive overview of the data with the use of stacked areas and bars.
+-   It includes *annotated descriptions* on certain data points, enhancing the interpretability of the visualisation.
+-   The timeline shows *clear trends* over the decades, highlighting the increasing frequency and costs of natural disasters.
 
 # Suggested Improvements
-1. *Split the visualisation into two separate plots* to better highlight the trends in frequency and costs of billion-dollar disasters.
-2. *Enhance the color palette* to improve readability and distinguish between different disaster types.
-3. *Group disaster types* together to provide a clearer overview of the data.
-    
+
+1.  *Split the visualisation into two separate plots* to better highlight the trends in frequency and costs of billion-dollar disasters.
+2.  *Enhance the color palette* to improve readability and distinguish between different disaster types.
+3.  *Group disaster types* together to provide a clearer overview of the data.
+
 # Implementation
+
 ## Data
-*  ...
-*  ...
+
+-   ...
+-   ...
 
 ## Software
+
 We used the Quarto publication framework and the R programming language, along with the following third-party packages:
 
-*   *tidyverse* for data transformation, including *ggplot2* for visualization
-    based on the grammar of graphics
-*   *knitr* for dynamic document generation
+-   *tidyverse* for data transformation, including *ggplot2* for visualization based on the grammar of graphics
+-   *knitr* for dynamic document generation
 
 # Improved Visualization
+
 ## Estimated Costs of Billion-Dollar Disasters in the USA by Year
+
 ```{r}
 #| label: fig-ggplot
 #| fig-width: 10
@@ -212,6 +221,7 @@ bdd_category_cost_summary |>
 ```
 
 ## Frequency of Billion-Dollar Disasters in the USA by Year
+
 ```{r}
 #| label: fig-ggplot2
 #| fig-width: 10
@@ -371,15 +381,16 @@ bdd_3cat
 
 ```
 
-
 ## Combined Plot of Costs and Frequency
+
 ```{r}
 # something here
 ```
 
-
 # Further Suggestions for Interactivity
+
 ...
 
 # Conclusion
+
 ...
