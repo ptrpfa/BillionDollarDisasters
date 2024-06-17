@@ -22,6 +22,9 @@ knitr:
 # Execute data preparations and load graphics
 library(knitr)
 library(scales)
+library(ggplot2)
+library(dplyr)
+library(patchwork)
 purl("preparation.qmd")
 source("preparation.R")
 ```
@@ -188,7 +191,7 @@ bdd_category_cost_summary |>
 # Stacked area plot
 bdd_category_cost_summary$Category <- factor(bdd_category_cost_summary$Category , levels=c("Storm Events", "Dry Weather Events", "Wet Weather Events"))
 
-bdd_category_cost_summary |>
+bdd_cost_plot <- bdd_category_cost_summary |>
   ggplot(aes(x = Year, y = Cost, fill = Category)) +
   geom_area(position = "stack", alpha = 0.6) +
   labs(
@@ -218,6 +221,7 @@ bdd_category_cost_summary |>
     breaks = seq(0, 650, by = 50),
     # limits = c(0, max(bdd_category_cost_summary$Cost) + 25)
   )
+bdd_cost_plot
 ```
 
 ## Frequency of Billion-Dollar Disasters in the USA by Year
@@ -238,9 +242,9 @@ custom_palette <- c(
   "Flooding" = "#a6cee3", # Light blue
   "Severe Storm" = "#7DC15A", # Darker yellow (light Green)
   "Tropical Cyclone" = "#C1F2B0", # Darker Green (dark Green)
-  "Storm Events" = "#7DC15A", # Darker yellow (light Green)
-  "Wet Weather Events" = "#6baed6", # Darker Green (dark Green)
-  "Dry Weather Events" = "#fb6a4a" # Dark blue
+  "Storm Events" = "#66c2a5", # Darker yellow (light Green)
+  "Wet Weather Events" = "#8da0cb", # Darker Green (dark Green)
+  "Dry Weather Events" = "#fc8d62" # Dark blue
 )
 
 bdd_events_frequency_cost$Disaster <- factor(
@@ -317,13 +321,22 @@ bdd_events_frequency_cost |> ggplot(aes(
     )
   )
 
+bdd_events_frequency_cost_summary <- bdd_events_frequency_cost %>%
+  mutate(Interval = cut(Year, breaks = seq(1980, 2024, by = 5), right = FALSE)) %>%
+  group_by(Interval, Category) %>%
+  summarise(Count = sum(Count), .groups = 'drop')
+
+#Sort the categories by total frequency
+category_totals <- bdd_events_frequency_cost |>
+  group_by(Category) |>
+  summarise(Total = sum(Count)) |>
+  arrange(Total)
+
+ordered_categories <- category_totals$Category
+
 bdd_events_frequency_cost$Category <- factor(
   bdd_events_frequency_cost$Category,
-  levels = c(
-    "Dry Weather Events",
-    "Wet Weather Events",
-    "Storm Events"
-  )
+  levels = ordered_categories
 )
 
 # Base plot
@@ -379,12 +392,43 @@ bdd_3cat <-
 
 bdd_3cat
 
+# Flipped, grouped values by 5-year intervals
+bdd_events_frequency_cost_summary <- bdd_events_frequency_cost |>
+  filter(Category %in% c("Storm Events", "Wet Weather Events", "Dry Weather Events")) |>
+  mutate(Interval = cut(Year, breaks = seq(1980, 2025, by = 5), right = FALSE, labels = seq(1980, 2020, by = 5))) |>
+  group_by(Interval, Category) |>
+  summarise(Count = sum(Count), .groups = 'drop')
+
+five_years_bdd_3cat <- ggplot(bdd_events_frequency_cost_summary, aes(x = Interval, y = Count, fill = Category)) +
+  geom_bar(stat = "identity", width = 0.5) +
+  labs(
+    x = NULL,
+    y = "Frequency of billion-dollar disaster",
+    title = NULL,
+    caption = "Source: NCEI (2024)"
+  ) +
+  scale_fill_manual(values = custom_palette) +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 12),  # Adjust overall text size
+    axis.title.y = element_text(margin = margin(r = 20)),
+    panel.grid.major = element_line(color = "grey", linewidth = 0.5),
+    panel.grid.minor = element_blank(),  # Hide minor grid lines
+    axis.text.x = element_blank(),  # Remove x-axis text
+    axis.ticks.x = element_blank()  # Remove x-axis ticks
+  ) +
+  scale_y_reverse() + 
+  guides(fill = FALSE)
+
+five_years_bdd_3cat
 ```
 
 ## Combined Plot of Costs and Frequency
 
 ```{r}
-# something here
+combined_plots <- bdd_cost_plot / five_years_bdd_3cat
+
+combined_plots
 ```
 
 # Further Suggestions for Interactivity
