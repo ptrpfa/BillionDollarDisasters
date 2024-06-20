@@ -85,78 +85,9 @@ We used the Quarto publication framework and the R programming language, along w
 #| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar
 #| Disasters in the USA by year."
 
-# Base plot
-bdd_category_cost |>
-  ggplot(aes(x = Year, y = Cost, color = Category)) +
-  geom_line() +
-  geom_point() +
-  labs(
-    x = "Year",
-    y = "Cost (CPI-Adjusted, Billion $USD)",
-    color = "Disaster Type",
-    title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
-    caption = "Source: NCEI (2024)"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    plot.caption = element_text(size = 12),
-    legend.title = element_text(size = 12, margin = margin(r = 12)),
-    legend.text = element_text(size = 10),
-    axis.title = element_text(size = 14),
-    axis.title.x = element_text(margin = margin(t = 20)),
-    axis.title.y = element_text(margin = margin(r = 20)),
-    axis.text = element_text(size = 12),
-    legend.position = "top"
-  ) +
-  # scale_color_brewer(palette = "Paired") +
-  scale_x_continuous(breaks = seq(min(bdd_category_cost$Year),
-    max(bdd_category_cost$Year + 5),
-    by = 5
-  )) +
-  scale_y_continuous(breaks = seq(0,
-    max(bdd_category_cost$Cost + 25),
-    by = 25
-  ))
-
-# Base plot (cut-off extreme values)
-bdd_category_cost |>
-  ggplot(aes(x = Year, y = Cost, color = Category)) +
-  geom_line() +
-  geom_point() +
-  labs(
-    x = "Year",
-    y = "Cost (CPI-Adjusted, Billion $USD)",
-    color = "Disaster Type",
-    title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
-    caption = "Source: NCEI (2024)"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    plot.caption = element_text(size = 12),
-    legend.title = element_text(size = 12, margin = margin(r = 12)),
-    legend.text = element_text(size = 10),
-    axis.title = element_text(size = 14),
-    axis.title.x = element_text(margin = margin(t = 20)),
-    axis.title.y = element_text(margin = margin(r = 20)),
-    axis.text = element_text(size = 12),
-    legend.position = "top"
-  ) +
-  # scale_color_brewer(palette = "Paired") +
-  scale_x_continuous(breaks = seq(min(bdd_category_cost$Year),
-    max(bdd_category_cost$Year + 5),
-    by = 5
-  )) +
-  scale_y_continuous(breaks = seq(0,
-    max(bdd_category_cost$Cost + 10),
-    by = 10
-  )) +
-  coord_cartesian(xlim = c(1980, 2024), ylim = c(0, 100))
-
-# Grouped values by 5-year intervals
-bdd_category_cost_summary |>
-  ggplot(aes(x = Year, y = Cost, color = Category)) +
+# Basic line chart
+bdd_cost_summary |>
+  ggplot(aes(x = Interval, y = Cost, color = Category, group = Category)) +
   geom_line(aes(color = Category)) +
   geom_point(aes(color = Category)) +
   labs(
@@ -176,23 +107,20 @@ bdd_category_cost_summary |>
     axis.title.x = element_text(margin = margin(t = 20)),
     axis.title.y = element_text(margin = margin(r = 20)),
     axis.text = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top"
   ) +
-  # scale_color_brewer(palette = "Paired") +
-  scale_x_continuous(breaks = seq(min(bdd_category_cost_summary$Year),
-    max(bdd_category_cost_summary$Year + 5),
-    by = 5
-  )) +
+  scale_color_brewer(palette = "Dark2") +
   scale_y_continuous(breaks = seq(0,
-    max(bdd_category_cost_summary$Cost + 100),
+    max(bdd_cost_summary$Cost + 100),
     by = 100
   ))
 
-# Stacked area plot
-bdd_category_cost_summary$Category <- factor(bdd_category_cost_summary$Category , levels=c("Storm Events", "Dry Weather Events", "Wet Weather Events"))
+bdd_cost_summary$Category <- factor(bdd_cost_summary$Category , levels=c("Storm Events", "Dry Weather Events", "Wet Weather Events"))
 
-bdd_cost_plot <- bdd_category_cost_summary |>
-  ggplot(aes(x = Year, y = Cost, fill = Category)) +
+# Stacked area plot
+bdd_cost_plot <- bdd_cost_summary |>
+  ggplot(aes(x = Interval, y = Cost, fill = Category, group = Category)) +
   geom_area(position = "stack", alpha = 0.6) +
   labs(
     x = "Year",
@@ -211,16 +139,11 @@ bdd_cost_plot <- bdd_category_cost_summary |>
     axis.title.x = element_text(margin = margin(t = 20)),
     axis.title.y = element_text(margin = margin(r = 20)),
     axis.text = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top"
   ) +
-  scale_color_brewer(palette = "Paired") +
-  scale_x_continuous(
-    breaks = seq(min(bdd_category_cost_summary$Year), max(bdd_category_cost_summary$Year), by = 5),
-    minor_breaks = NULL) +
-  scale_y_continuous(
-    breaks = seq(0, 650, by = 50),
-    # limits = c(0, max(bdd_category_cost_summary$Cost) + 25)
-  )
+  scale_color_brewer(palette = "Dark2") +
+  scale_y_continuous(breaks = seq(0, 650, by = 50))
 bdd_cost_plot
 ```
 
@@ -427,7 +350,6 @@ five_years_bdd_3cat
 
 ```{r}
 combined_plots <- bdd_cost_plot / five_years_bdd_3cat
-
 combined_plots
 ```
 
