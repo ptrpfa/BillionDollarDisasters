@@ -314,7 +314,7 @@ flipped_bdd_3cat <- bdd_3cat + labs(
     axis.text.x = element_blank(),  # Remove x-axis text
     axis.ticks.x = element_blank()  # Remove x-axis ticks
   ) +
-  scale_y_reverse(breaks = seq(0, 100, by = 5)) + 
+  scale_y_reverse(breaks = seq(0, 100, by = 10)) + 
   guides(fill = FALSE)
 
 flipped_bdd_3cat
@@ -324,8 +324,8 @@ flipped_bdd_3cat
 
 ```{r}
 #| label: fig-combined-plot
-#| fig-width: 15
-#| fig-height: 20
+#| fig-width: 10
+#| fig-height: 10
 #| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar
 #| Disasters in the USA by year."
 
