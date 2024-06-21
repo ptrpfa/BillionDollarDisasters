@@ -160,7 +160,7 @@ bdd_cost_plot
 #| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar
 #| Disasters in the USA by year."
 
-# Create custom colour palette with distinct shades
+# Create custom colour palette with distinct shades for each disaster type
 custom_palette <- c(
   "Wildfire" = "#fc9e87", # Light red
   "Drought" = "#fb6a4a", # Dark red
@@ -248,29 +248,11 @@ bdd_events_frequency_cost |> ggplot(aes(
     )
   )
 
-bdd_events_frequency_cost_summary <- bdd_events_frequency_cost %>%
-  mutate(Interval = cut(Year, breaks = seq(1980, 2024, by = 5), right = FALSE)) %>%
-  group_by(Interval, Category) %>%
-  summarise(Count = sum(Count), .groups = 'drop')
-
-#Sort the categories by total frequency
-category_totals <- bdd_events_frequency_cost |>
-  group_by(Category) |>
-  summarise(Total = sum(Count)) |>
-  arrange(Total)
-
-ordered_categories <- category_totals$Category
-
-bdd_events_frequency_cost$Category <- factor(
-  bdd_events_frequency_cost$Category,
-  levels = ordered_categories
-)
-
-# Base plot
+# Main plot for combined with year interval
 bdd_3cat <- 
-  bdd_events_frequency_cost |>
-  ggplot(aes(x = Year, y = Count, fill = Category)) +
-  geom_bar(stat = "identity") +
+  bdd_frequency_summary |>
+  ggplot(aes(x = Interval, y = Count, fill = Category, group = Category)) +
+  geom_bar(stat = "identity", width = 0.75) +
   labs(
     x = "Year",
     y = "Frequency of billion-dollar disaster",
@@ -291,10 +273,6 @@ bdd_3cat <-
     panel.grid.major = element_line(color = "grey", linewidth = 0.5),
     panel.grid.minor = element_blank() # Hide minor grid lines
   )  +
-  scale_y_continuous(
-    breaks = seq(0, 30, by = 3), # Set breaks at intervals of 5
-    limits = c(0, 30) # Set Y-axis limits from 0 to 30
-  ) +
   guides(
     fill = guide_legend(
       title = "Disaster", # Proper title without causing NULL
@@ -315,20 +293,12 @@ bdd_3cat <-
       "Wet Weather Events",
       "Dry Weather Events"
     )
-  )
-
+  ) +
+  scale_y_continuous(breaks = seq(0, 100, by = 5))
 bdd_3cat
 
-# Flipped, grouped values by 5-year intervals
-bdd_events_frequency_cost_summary <- bdd_events_frequency_cost |>
-  filter(Category %in% c("Storm Events", "Wet Weather Events", "Dry Weather Events")) |>
-  mutate(Interval = cut(Year, breaks = seq(1980, 2025, by = 5), right = FALSE, labels = seq(1980, 2020, by = 5))) |>
-  group_by(Interval, Category) |>
-  summarise(Count = sum(Count), .groups = 'drop')
-
-five_years_bdd_3cat <- ggplot(bdd_events_frequency_cost_summary, aes(x = Interval, y = Count, fill = Category)) +
-  geom_bar(stat = "identity", width = 0.5) +
-  labs(
+# Flipped mained plot
+flipped_bdd_3cat <- bdd_3cat + labs(
     x = NULL,
     y = "Frequency of billion-dollar disaster",
     title = NULL,
@@ -344,16 +314,23 @@ five_years_bdd_3cat <- ggplot(bdd_events_frequency_cost_summary, aes(x = Interva
     axis.text.x = element_blank(),  # Remove x-axis text
     axis.ticks.x = element_blank()  # Remove x-axis ticks
   ) +
-  scale_y_reverse() + 
+  scale_y_reverse(breaks = seq(0, 100, by = 5)) + 
   guides(fill = FALSE)
 
-five_years_bdd_3cat
+flipped_bdd_3cat
 ```
 
 ## Combined Plot of Costs and Frequency
 
 ```{r}
-combined_plots <- bdd_cost_plot / five_years_bdd_3cat
+#| label: fig-combined-plot
+#| fig-width: 15
+#| fig-height: 20
+#| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar
+#| Disasters in the USA by year."
+
+
+combined_plots <- bdd_cost_plot / flipped_bdd_3cat
 combined_plots
 ```
 

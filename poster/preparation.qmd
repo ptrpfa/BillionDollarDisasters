@@ -236,6 +236,33 @@ bdd_frequency
 verify_data(bdd_frequency)
 ```
 
+```{r}
+#| label: process-time-series-data-frequency-interval
+
+# Get cost of disaster categories for every 5-year interval
+bdd_frequency_summary <- bdd_frequency |> 
+  mutate(Interval = cut(Year, breaks = seq(1980, max(Year) + 5, by = 5), right = FALSE, include.lowest = TRUE)) |> 
+  mutate(Interval = factor(Interval, levels = levels(Interval), ordered = TRUE, labels = gsub("2025", "2024", gsub(",", "-", gsub("\\[|\\)|\\]", "", levels(Interval)))))) |> 
+  group_by(Interval, Category) |> 
+  summarize(Count = sum(Count, na.rm = TRUE), .groups = 'drop')
+bdd_frequency_summary
+
+# Ensure that there are no missing values or categories
+verify_data(bdd_frequency_summary)
+
+category_totals <- bdd_frequency_summary |>
+  group_by(Category) |>
+  summarise(Total = sum(Count)) |>
+  arrange(Total)
+
+ordered_categories <- category_totals$Category
+
+bdd_frequency_summary$Category <- factor(
+  bdd_frequency_summary$Category,
+  levels = ordered_categories
+)
+```
+
 ## Process Events Data
 ### Base Events
 ```{r}
