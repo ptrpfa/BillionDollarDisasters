@@ -151,97 +151,10 @@ bdd_cost_plot
 #| fig-height: 8
 #| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar
 #| Disasters in the USA by year."
-
-# Create custom colour palette with distinct shades for each disaster type
-custom_palette <- c(
-  "Wildfire" = "#fc9e87", # Light red
-  "Drought" = "#fb6a4a", # Dark red
-  "Freeze" = "#679ad2", # Dark blue
-  "Winter Storm" = "#6baed6", # Medium blue
-  "Flooding" = "#a6cee3", # Light blue
-  "Severe Storm" = "#7DC15A", # Darker yellow (light Green)
-  "Tropical Cyclone" = "#C1F2B0", # Darker Green (dark Green)
-  "Storm Events" = "#66c2a5", # Darker yellow (light Green)
-  "Wet Weather Events" = "#8da0cb", # Darker Green (dark Green)
-  "Dry Weather Events" = "#fc8d62" # Dark blue
-)
-
-bdd_events_frequency_cost$Disaster <- factor(
-  bdd_events_frequency_cost$Disaster,
-  levels = c(
-    "Wildfire",
-    "Drought",
-    "Flooding",
-    "Winter Storm",
-    "Freeze",
-    "Tropical Cyclone",
-    "Severe Storm"
-  )
-)
-
-# Create a stacked histogram of the frequency USA from 1980 to 2024
-bdd_events_frequency_cost |> ggplot(aes(
-  x = Year,
-  y = Count,
-  fill = Disaster
-)) +
-  geom_bar(stat = "identity") +
-  labs(
-    x = "Year",
-    y = "Frequency of billion-dollar disaster",
-    title = "Frequency of Billion-Dollar Disasters in the USA (1980-2024)",
-    caption = "Source: NCEI (2024)"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    plot.caption = element_text(size = 12),
-    legend.title = element_text(size = 12, margin = margin(r = 12)),
-    legend.text = element_text(size = 10),
-    legend.position = "top",
-    axis.title = element_text(size = 14),
-    axis.title.x = element_text(margin = margin(t = 20)),
-    axis.title.y = element_text(margin = margin(r = 20)),
-    axis.text = element_text(size = 12),
-    panel.grid.major = element_line(color = "grey", linewidth = 0.5),
-    panel.grid.minor = element_blank() # Hide minor grid lines
-  ) +
-  scale_fill_manual(
-    values = custom_palette,
-    breaks = c(
-      "Severe Storm",
-      "Tropical Cyclone",
-      "Freeze",
-      "Winter Storm",
-      "Flooding",
-      "Drought",
-      "Wildfire"
-    ), labels = c(
-      "Severe Storm",
-      "Tropical Cyclone",
-      "Freeze",
-      "Winter Storm",
-      "Flooding",
-      "Drought",
-      "Wildfire"
-    )
-  ) +
-  scale_y_continuous(
-    breaks = seq(0, 30, by = 3), # Set breaks at intervals of 5
-    limits = c(0, 30) # Set Y-axis limits from 0 to 30
-  ) +
-  guides(
-    fill = guide_legend(
-      title = "Disaster", # Proper title without causing NULL
-      title.position = "left",
-      label.position = "right",
-      keywidth = unit(1, "lines"), # Set key width to match desired format
-      keyheight = unit(1, "lines") # Set key height to match desired format
-    )
-  )
+#| warning: false
 
 # Main plot for combined with year interval
-bdd_3cat <-
+bdd_freq_plot <-
   bdd_frequency_summary |>
   ggplot(aes(x = Interval, y = Count, fill = Category, group = Category)) +
   geom_bar(stat = "identity", width = 0.75) +
@@ -267,38 +180,37 @@ bdd_3cat <-
   ) +
   guides(
     fill = guide_legend(
-      title = "Disaster", # Proper title without causing NULL
+      title = "Disaster", 
       title.position = "left",
       label.position = "right",
-      keywidth = unit(1, "lines"), # Set key width to match desired format
-      keyheight = unit(1, "lines") # Set key height to match desired format
+      keywidth = unit(1, "lines"), 
+      keyheight = unit(1, "lines") 
     )
   ) +
   scale_fill_manual(values = category_colors) +
   scale_y_continuous(breaks = seq(0, 100, by = 5))
-bdd_3cat
 
 # Flipped mained plot
-flipped_bdd_3cat <- bdd_3cat + labs(
+flipped_bdd_freq_plot <- bdd_freq_plot + labs(
   x = NULL,
   y = "Frequency of billion-dollar disaster",
   title = NULL,
   caption = "Source: NCEI (2024)"
 ) +
-  scale_fill_manual(values = category_colors) +
   theme_minimal() +
   theme(
-    text = element_text(size = 12), # Adjust overall text size
-    axis.title.y = element_text(margin = margin(r = 20)),
+    plot.caption = element_text(size = 12),
     panel.grid.major = element_line(color = "grey", linewidth = 0.5),
-    panel.grid.minor = element_blank(), # Hide minor grid lines
-    axis.text.x = element_blank(), # Remove x-axis text
-    axis.ticks.x = element_blank() # Remove x-axis ticks
+    panel.grid.minor = element_blank(), 
+    axis.text.x = element_blank(),
+    axis.title.y = element_text(margin = margin(r = 20)),
+    axis.text = element_text(size = 12),
+    axis.ticks.x = element_blank() 
   ) +
   scale_y_reverse(breaks = seq(0, 100, by = 10)) +
   guides(fill = FALSE)
 
-flipped_bdd_3cat
+flipped_bdd_freq_plot
 ```
 
 ## Combined Plot of Costs and Frequency
@@ -311,7 +223,7 @@ flipped_bdd_3cat
 #| Disasters in the USA by year."
 #| warning: false
 
-combined_plots <- bdd_cost_plot / flipped_bdd_3cat
+combined_plots <- bdd_cost_plot / flipped_bdd_freq_plot
 combined_plots
 ```
 
