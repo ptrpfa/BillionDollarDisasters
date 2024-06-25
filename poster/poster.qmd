@@ -94,7 +94,7 @@ We used the Quarto publication framework and the R programming language, along w
 
 # Plot the estimated costs of billion-dollar disasters in the USA by year
 bdd_cost_plot <- ggplot(bdd_cost_combined) +
-  aes(x = Interval, y = Cost,  color = Category, group = Category) +
+  aes(x = Interval, y = Cost,  color = Category, group = Category, linetype = Category) +
   # Plot colored area under the overall trend line
   stat_smooth(
     data = bdd_cost_summary_aggregated,
@@ -111,7 +111,7 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     y = "Cost (CPI-Adjusted, Billion $USD)",
     color = "Disaster Type",
     title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
-    caption = "Source: NCEI (2024)"
+    # caption = "Source: NCEI (2024)"
   ) +
   theme_minimal() +
   theme(
@@ -127,12 +127,17 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     axis.text.x = element_text(margin = margin(r = 20)),
     panel.grid.minor = element_blank()
   ) +
-  scale_fill_manual(values = category_colors) +
   scale_color_manual(values = category_colors) +
+  scale_fill_manual(values = category_colors) +
+  scale_linetype_manual(values = c("All Events" = "dashed",
+                                   "Dry Weather Events" = "solid",
+                                   "Storm Events" = "solid",
+                                   "Wet Weather Events" = "solid")) +
   scale_y_continuous(breaks = seq(0, max(bdd_cost_summary_aggregated$Cost) + 50, by = 50)) +
   guides(
     shape = "none",
     fill = "none",
+    linetype = "none",
     color = guide_legend(override.aes = list(fill = NA, size = 3))
   )
 bdd_cost_plot
