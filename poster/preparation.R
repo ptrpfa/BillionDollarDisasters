@@ -136,6 +136,10 @@ bdd_frequency_summary
 # Ensure that there are no missing values or categories
 verify_data(bdd_frequency_summary)
 
+bdd_frequency_total <- bdd_frequency_summary |>
+  group_by(Interval) |>
+  summarise(TotalCount = sum(Count))
+
 category_totals <- bdd_frequency_summary |>
   group_by(Category) |>
   summarise(Total = sum(Count)) |>
