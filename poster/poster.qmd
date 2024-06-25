@@ -84,19 +84,26 @@ We used the Quarto publication framework and the R programming language, along w
 #| fig-height: 8
 #| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar
 #| Disasters in the USA by year."
+#| warning: false
 
-# Faceted line graph
-bdd_cost_line_plot <- bdd_cost_summary |>
-  ggplot(aes(x = Interval, y = Cost, color = Category, fill = Category, group = Category)) +
-  geom_line() +
-  geom_point() +
-  geom_area(position = "stack", alpha = 0.6) +
-  facet_wrap(~ Category, ncol = 1) +
+# Plot the estimated costs of billion-dollar disasters in the USA by year
+bdd_cost_plot <- ggplot(bdd_cost_combined) +
+  aes(x = Interval, y = Cost,  color = Category, group = Category) +
+  # Plot colored area under the overall trend line
+  stat_smooth(
+    data = bdd_cost_summary_aggregated,
+    aes(fill = Category),
+    geom = "area",
+    span = 0.45,
+    alpha = 0.05,
+    linewidth = 0
+  ) +
+  stat_smooth(method = "loess", span = 0.5) +
+  geom_point(aes(shape = Category), size = 2.5) +
   labs(
     x = "Year",
     y = "Cost (CPI-Adjusted, Billion $USD)",
     color = "Disaster Type",
-    fill = "Disaster Type",
     title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
     caption = "Source: NCEI (2024)"
   ) +
@@ -113,40 +120,8 @@ bdd_cost_line_plot <- bdd_cost_summary |>
     axis.text = element_text(size = 12),
     axis.text.x = element_text(angle = 45, hjust = 1)
   ) +
-  scale_color_brewer(palette = "Dark2") +
   scale_fill_brewer(palette = "Dark2") +
-  scale_y_continuous(breaks = seq(0, max(bdd_cost_summary$Cost + 100), by = 100)) +
-  guides(color = guide_legend(), fill = guide_legend())  # Ensure only one legend is displayed
-bdd_cost_line_plot
-
-bdd_cost_summary$Category <- factor(bdd_cost_summary$Category , levels=c("Storm Events", "Dry Weather Events", "Wet Weather Events"))
-
-# Stacked area plot
-bdd_cost_plot <- bdd_cost_summary |>
-  ggplot(aes(x = Interval, y = Cost, fill = Category, group = Category)) +
-  geom_area(position = "stack", alpha = 0.6) +
-  labs(
-    x = "Year",
-    y = "Cost (CPI-Adjusted, Billion $USD)",
-    color = "Disaster Type",
-    title = "Estimated Cost of Billion-Dollar Disasters in the USA (1980-2024)",
-    caption = "Source: NCEI (2024)"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    plot.caption = element_text(size = 12),
-    legend.title = element_text(size = 12, margin = margin(r = 12)),
-    legend.text = element_text(size = 10),
-    axis.title = element_text(size = 14),
-    axis.title.x = element_text(margin = margin(t = 20)),
-    axis.title.y = element_text(margin = margin(r = 20)),
-    axis.text = element_text(size = 12),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "top"
-  ) +
   scale_color_brewer(palette = "Dark2") +
-  scale_fill_brewer(palette = "Dark2") +
   scale_y_continuous(breaks = seq(0, 650, by = 50))
 bdd_cost_plot
 ```
@@ -249,7 +224,7 @@ bdd_events_frequency_cost |> ggplot(aes(
   )
 
 # Main plot for combined with year interval
-bdd_3cat <- 
+bdd_3cat <-
   bdd_frequency_summary |>
   ggplot(aes(x = Interval, y = Count, fill = Category, group = Category)) +
   geom_bar(stat = "identity", width = 0.75) +
@@ -272,7 +247,7 @@ bdd_3cat <-
     axis.text = element_text(size = 12),
     panel.grid.major = element_line(color = "grey", linewidth = 0.5),
     panel.grid.minor = element_blank() # Hide minor grid lines
-  )  +
+  ) +
   guides(
     fill = guide_legend(
       title = "Disaster", # Proper title without causing NULL
@@ -299,22 +274,22 @@ bdd_3cat
 
 # Flipped mained plot
 flipped_bdd_3cat <- bdd_3cat + labs(
-    x = NULL,
-    y = "Frequency of billion-dollar disaster",
-    title = NULL,
-    caption = "Source: NCEI (2024)"
-  ) +
+  x = NULL,
+  y = "Frequency of billion-dollar disaster",
+  title = NULL,
+  caption = "Source: NCEI (2024)"
+) +
   scale_fill_manual(values = custom_palette) +
   theme_minimal() +
   theme(
-    text = element_text(size = 12),  # Adjust overall text size
+    text = element_text(size = 12), # Adjust overall text size
     axis.title.y = element_text(margin = margin(r = 20)),
     panel.grid.major = element_line(color = "grey", linewidth = 0.5),
-    panel.grid.minor = element_blank(),  # Hide minor grid lines
-    axis.text.x = element_blank(),  # Remove x-axis text
-    axis.ticks.x = element_blank()  # Remove x-axis ticks
+    panel.grid.minor = element_blank(), # Hide minor grid lines
+    axis.text.x = element_blank(), # Remove x-axis text
+    axis.ticks.x = element_blank() # Remove x-axis ticks
   ) +
-  scale_y_reverse(breaks = seq(0, 100, by = 10)) + 
+  scale_y_reverse(breaks = seq(0, 100, by = 10)) +
   guides(fill = FALSE)
 
 flipped_bdd_3cat

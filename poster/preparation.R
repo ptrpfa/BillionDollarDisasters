@@ -70,27 +70,36 @@ bdd_cost_summary <- bdd_cost |>
   mutate(Interval = factor(Interval, levels = levels(Interval), ordered = TRUE, labels = gsub("2025", "2024", gsub(",", "-", gsub("\\[|\\)|\\]", "", levels(Interval)))))) |> 
   group_by(Interval, Category) |> 
   summarize(Cost = sum(Cost, na.rm = TRUE), .groups = 'drop')
+
+# Set order of categories
+bdd_cost_summary$Category <- factor(bdd_cost_summary$Category , levels=c("Storm Events", "Dry Weather Events", "Wet Weather Events"))
 bdd_cost_summary
 
 # Ensure that there are no missing values or categories
 verify_data(bdd_cost_summary)
 
 # Get aggregated cost of disaster categories for every 5-year interval
-bdd_cost_aggregated <- bdd_cost_summary |>
+bdd_cost_summary_aggregated <- bdd_cost_summary |>
   group_by(Interval) |>
   summarize(Cost = sum(Cost, na.rm = TRUE), .groups = 'drop') |> 
   mutate(Category = "All Events") |> 
   select(Interval, Category, Cost)
-bdd_cost_aggregated
-
-# Combine the aggregated cost with the summary dataset
-# bdd_cost_aggregated <- bdd_cost_aggregated |>
-#   bind_rows(bdd_cost_summary) |>
-#   arrange(Interval, Category)
-# bdd_cost_aggregated
+bdd_cost_summary_aggregated
 
 # Ensure that there are no missing values or categories
-verify_data(bdd_cost_aggregated)
+verify_data(bdd_cost_summary_aggregated)
+
+# Combine the aggregated cost with the summary dataset
+bdd_cost_combined <- bdd_cost_summary_aggregated |>
+  bind_rows(bdd_cost_summary) |>
+  arrange(Interval, Category)
+
+# Set order of categories
+bdd_cost_combined$Category <- factor(bdd_cost_combined$Category , levels=c("All Events", "Storm Events", "Dry Weather Events", "Wet Weather Events"))
+bdd_cost_combined
+
+# Ensure that there are no missing values or categories
+verify_data(bdd_cost_combined)
 
 
 ## -----------------------------------------------------------------------------
