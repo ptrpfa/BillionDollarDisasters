@@ -106,9 +106,9 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
   geom_point(size = 2) +
   labs(
     x = "Year",
-    y = "Cost (CPI-Adjusted, Billion $USD)",
+    y = expression("Estimated Cost (Billion $USD)"^1*""),
     color = "Disaster Type",
-    title = "Estimated Cost/Frequncy of Billion-Dollar Disasters in the USA (1980-2024)"
+    title = "Frequency and Estimated Costs of Billion-Dollar Disasters in the USA (1980-2024)"
   ) +
   theme_minimal() +
   theme(
@@ -117,7 +117,7 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     legend.text = element_text(size = 10),
     legend.position = "top",
     axis.title = element_text(size = 14),
-    axis.title.x = element_text(size = 14, hjust = 1.05, margin = margin(t = -13)), # use t = -13 to be in-line with the x-axis, but unable to shift to the right
+    axis.title.x = element_text(size = 14, hjust = 1.07, margin = margin(t = -13)),
     axis.title.y = element_text(margin = margin(r = 20)),
     axis.text = element_text(size = 12),
     panel.grid.minor = element_blank(),
@@ -154,11 +154,11 @@ bdd_freq_plot <- ggplot() +
   geom_smooth(data = bdd_frequency_total, aes(x = Interval, y = TotalCount, group = 1), color = "#6A3D9A", linetype = "dashed", size = 1.1, span = 0.5) +
   labs(
     y = "Frequency",
-    caption = "Source: NCEI (2024)"
+    caption = "Source: NCEI (2024)\n\n¹CPI-adjusted for inflation"
   ) +
   theme_minimal() +
   theme(
-    plot.caption = element_text(size = 12),
+    plot.caption = element_text(size = 12, margin = margin(t = 10)),
     legend.title = element_text(size = 12, margin = margin(r = 12)),
     legend.text = element_text(size = 10),
     legend.position = "top",
@@ -190,7 +190,7 @@ bdd_freq_plot
 #| label: fig-combined-plot
 #| fig-width: 10
 #| fig-height: 10
-#| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar Disasters in the USA by year."
+#| fig-cap: "Revised Visualisation of Frequency and Estimated Costs of Billion-Dollar Disasters in the USA by year."
 #| warning: false
 
 combined_plots <- bdd_cost_plot / bdd_freq_plot
