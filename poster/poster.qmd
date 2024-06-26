@@ -28,11 +28,14 @@ library(patchwork)
 purl("preparation.qmd")
 source("preparation.R")
 
-# Define custom colors for each category, based on the Paired color palette from RColorBrewer
-category_colors <- c("All Events" = "#6A3D9A",
-                     "Dry Weather Events" = "#FF7F00",
-                     "Storm Events" = "#33A02C",
-                     "Wet Weather Events" = "#1F78B4")
+# Define custom colors for each category, based on the Paired color palette
+category_colors <- c(
+  "All Events" = "#6A3D9A",
+  "Dry Weather Events" = "#FF7F00",
+  "Storm Events" = "#33A02C",
+  "Wet Weather Events" = "#1F78B4"
+)
+legend_colors <- c("#6A3D9A", "#33A02C", "#FF7F00", "#1F78B4")
 ```
 
 # Introduction
@@ -47,7 +50,8 @@ To highlight the need for enhanced disaster preparedness in the USA, Dottle and 
 
 ```{r}
 #| label: fig-bb-on-poster
-#| fig-cap: "Frequency and Estimated Costs of Billion-Dollar Disasters in the USA by year, published by Bloomberg."
+#| fig-cap: "Frequency and Estimated Costs of Billion-Dollar Disasters in the
+#| USA by year, published by Bloomberg."
 #| out-width: 100%
 
 include_graphics("images/bb_bdd_cropped.png")
@@ -87,12 +91,19 @@ We used the Quarto publication framework and the R programming language, along w
 #| label: fig-ggplot
 #| fig-width: 10
 #| fig-height: 8
-#| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar Disasters in the USA by year."
+#| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar
+#| Disasters in the USA by year."
 #| warning: false
 
 # Plot the estimated costs of billion-dollar disasters in the USA by year
 bdd_cost_plot <- ggplot(bdd_cost_combined) +
-  aes(x = Interval, y = Cost,  color = Category, group = Category, linetype = Category) +
+  aes(
+    x = Interval,
+    y = Cost,
+    color = Category,
+    group = Category,
+    linetype = Category
+  ) +
   # Plot colored area under the overall trend line
   stat_smooth(
     data = bdd_cost_summary_aggregated,
@@ -106,9 +117,10 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
   geom_point(size = 3) +
   labs(
     x = "Year",
-    y = expression("Estimated Cost (Billion $USD)"^1*""),
+    y = expression("Estimated Cost (Billion $USD)"^1 * ""),
     color = "Disaster Type",
-    title = "Frequency and Estimated Costs of Billion-Dollar Disasters in the USA (1980-2024)"
+    title = paste("Frequency and Estimated Costs of Billion-Dollar",
+                  "Disasters in the USA (1980-2024)")
   ) +
   theme_minimal() +
   theme(
@@ -117,24 +129,35 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     legend.text = element_text(size = 11.5),
     legend.position = "top",
     axis.title = element_text(size = 14),
-    axis.title.x = element_text(size = 14, hjust = 1.07, margin = margin(t = -13)),
+    axis.title.x = element_text(
+      size = 14,
+      hjust = 1.07,
+      margin = margin(t = -13)
+    ),
     axis.title.y = element_text(margin = margin(r = 20)),
     axis.text = element_text(size = 12),
     panel.grid.minor = element_blank(),
-    plot.margin = unit(c(0, 1.5, 0, 0), "cm")  
+    plot.margin = unit(c(0, 1.5, 0, 0), "cm")
   ) +
   scale_color_manual(values = category_colors) +
   scale_fill_manual(values = category_colors) +
   scale_linetype_manual(
-    values = c("All Events" = "dashed", "Dry Weather Events" = "solid",
-               "Storm Events" = "solid", "Wet Weather Events" = "solid")
+    values = c(
+      "All Events" = "dashed", "Dry Weather Events" = "solid",
+      "Storm Events" = "solid", "Wet Weather Events" = "solid"
+    )
   ) +
-  scale_y_continuous(breaks = seq(0, max(bdd_cost_summary_aggregated$Cost) + 50, by = 50)) +
+  scale_y_continuous(
+    breaks = seq(0, max(bdd_cost_summary_aggregated$Cost) + 50, by = 50)
+  ) +
   guides(
     shape = "none",
     fill = "none",
     linetype = "none",
-    color = guide_legend(override.aes = list(fill = c("#6A3D9A","#33A02C","#FF7F00", "#1F78B4"), color = NA, size = 3, alpha = 1))
+    color = guide_legend(override.aes = list(fill = legend_colors,
+                                             color = NA,
+                                             size = 2,
+                                             alpha = 1))
   )
 bdd_cost_plot
 ```
@@ -145,13 +168,26 @@ bdd_cost_plot
 #| label: fig-ggplot2
 #| fig-width: 10
 #| fig-height: 8
-#| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar Disasters in the USA by year."
+#| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar Disasters
+#| in the USA by year."
 #| warning: false
 
 # Main plot for combined with year interval
 bdd_freq_plot <- ggplot() +
-  geom_bar(data = bdd_frequency_summary, aes(x = Interval, y = Count, fill = Category, group = Category), stat = "identity", width = 0.55) +
-  geom_smooth(data = bdd_frequency_total, aes(x = Interval, y = TotalCount, group = 1), color = "#6A3D9A", linetype = "dashed", size = 1.1, span = 0.7, se = FALSE) +
+  geom_bar(
+    data = bdd_frequency_summary,
+    aes(x = Interval, y = Count, fill = Category, group = Category),
+    stat = "identity", width = 0.55
+  ) +
+  geom_smooth(
+    data = bdd_frequency_total,
+    aes(x = Interval, y = TotalCount, group = 1),
+    color = "#6A3D9A",
+    linetype = "dashed",
+    size = 1.1,
+    span = 0.7,
+    se = FALSE
+  ) +
   labs(
     y = "Frequency",
     caption = "Source: NCEI (2024)\n\n¹CPI-adjusted for inflation"
@@ -171,11 +207,11 @@ bdd_freq_plot <- ggplot() +
   ) +
   guides(
     fill = guide_legend(
-      title = "Disaster", 
+      title = "Disaster",
       title.position = "left",
       label.position = "right",
-      keywidth = unit(1, "lines"), 
-      keyheight = unit(1, "lines") 
+      keywidth = unit(1, "lines"),
+      keyheight = unit(1, "lines")
     )
   ) +
   scale_fill_manual(values = category_colors) +
@@ -190,7 +226,8 @@ bdd_freq_plot
 #| label: fig-combined-plot
 #| fig-width: 10
 #| fig-height: 10
-#| fig-cap: "Revised Visualisation of Frequency and Estimated Costs of Billion-Dollar Disasters in the USA by year."
+#| fig-cap: "Revised Visualisation of Frequency and Estimated Costs of
+#| Billion-Dollar Disasters in the USA by year."
 #| warning: false
 
 combined_plots <- bdd_cost_plot / bdd_freq_plot
