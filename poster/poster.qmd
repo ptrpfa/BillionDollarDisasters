@@ -117,10 +117,11 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     legend.text = element_text(size = 10),
     legend.position = "top",
     axis.title = element_text(size = 14),
-    axis.title.x = element_text(size = 14, hjust = 1, margin = margin(t = 15)), # use t = -13 to be in-line with the x-axis, but unable to shift to the right
+    axis.title.x = element_text(size = 14, hjust = 1.05, margin = margin(t = -13)), # use t = -13 to be in-line with the x-axis, but unable to shift to the right
     axis.title.y = element_text(margin = margin(r = 20)),
     axis.text = element_text(size = 12),
-    panel.grid.minor = element_blank()
+    panel.grid.minor = element_blank(),
+    plot.margin = unit(c(0, 1.5, 0, 0), "cm")  
   ) +
   scale_color_manual(values = category_colors) +
   scale_fill_manual(values = category_colors) +
