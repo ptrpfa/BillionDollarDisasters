@@ -113,8 +113,8 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    legend.title = element_text(size = 12, margin = margin(r = 12)),
-    legend.text = element_text(size = 10),
+    legend.title = element_text(size = 11.5, margin = margin(r = 10)),
+    legend.text = element_text(size = 11.5),
     legend.position = "top",
     axis.title = element_text(size = 14),
     axis.title.x = element_text(size = 14, hjust = 1.07, margin = margin(t = -13)),
@@ -151,7 +151,7 @@ bdd_cost_plot
 # Main plot for combined with year interval
 bdd_freq_plot <- ggplot() +
   geom_bar(data = bdd_frequency_summary, aes(x = Interval, y = Count, fill = Category, group = Category), stat = "identity", width = 0.55) +
-  geom_smooth(data = bdd_frequency_total, aes(x = Interval, y = TotalCount, group = 1), color = "#6A3D9A", linetype = "dashed", size = 1.1, span = 0.5) +
+  geom_smooth(data = bdd_frequency_total, aes(x = Interval, y = TotalCount, group = 1), color = "#6A3D9A", linetype = "dashed", size = 1.1, span = 0.7, se = FALSE) +
   labs(
     y = "Frequency",
     caption = "Source: NCEI (2024)\n\n¹CPI-adjusted for inflation"
