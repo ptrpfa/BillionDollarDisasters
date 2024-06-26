@@ -103,7 +103,7 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     linewidth = 0
   ) +
   stat_smooth(method = "loess", span = 0.5) +
-  geom_point(size = 2) +
+  geom_point(size = 3) +
   labs(
     x = "Year",
     y = expression("Estimated Cost (Billion $USD)"^1*""),
@@ -134,7 +134,7 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     shape = "none",
     fill = "none",
     linetype = "none",
-    color = guide_legend(override.aes = list(fill = NA, size = 3))
+    color = guide_legend(override.aes = list(fill = c("#6A3D9A","#33A02C","#FF7F00", "#1F78B4"), color = NA, size = 3, alpha = 1))
   )
 bdd_cost_plot
 ```
@@ -150,7 +150,7 @@ bdd_cost_plot
 
 # Main plot for combined with year interval
 bdd_freq_plot <- ggplot() +
-  geom_bar(data = bdd_frequency_summary, aes(x = Interval, y = Count, fill = Category, group = Category), stat = "identity", width = 0.6) +
+  geom_bar(data = bdd_frequency_summary, aes(x = Interval, y = Count, fill = Category, group = Category), stat = "identity", width = 0.55) +
   geom_smooth(data = bdd_frequency_total, aes(x = Interval, y = TotalCount, group = 1), color = "#6A3D9A", linetype = "dashed", size = 1.1, span = 0.5) +
   labs(
     y = "Frequency",
@@ -179,7 +179,7 @@ bdd_freq_plot <- ggplot() +
     )
   ) +
   scale_fill_manual(values = category_colors) +
-  scale_y_reverse(breaks = seq(0, 100, by = 10)) +
+  scale_y_reverse(breaks = seq(0, 100, by = 10), limits = c(100, 0)) +
   guides(fill = FALSE)
 bdd_freq_plot
 ```
