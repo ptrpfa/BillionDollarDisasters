@@ -139,6 +139,7 @@ verify_data(bdd_frequency_summary)
 bdd_frequency_total <- bdd_frequency_summary |>
   group_by(Interval) |>
   summarise(TotalCount = sum(Count))
+bdd_frequency_total
 
 category_totals <- bdd_frequency_summary |>
   group_by(Category) |>
