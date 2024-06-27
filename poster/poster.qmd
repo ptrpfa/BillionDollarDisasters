@@ -72,9 +72,11 @@ include_graphics("images/bb_bdd_cropped.png")
 # Implementation
 
 ## Data
+-   Frequency and estimated cost for each disaster type is obtained from the National Centers for Environmental Information (NCEI). [^ncei_timeseries] 
+-   Consolidated data with NCEI USA to obtain more detailed information on each disaster specific to the United States.[^ncei_usa]
 
--   ...
--   ...
+[^ncei_timeseries]: <https://www.ncei.noaa.gov/access/billions/time-series>
+[^ncei_usa] : <https://www.ncei.noaa.gov/access/billions/state-summary/US>
 
 ## Software
 
@@ -82,10 +84,12 @@ We used the Quarto publication framework and the R programming language, along w
 
 -   *tidyverse* for data transformation, including *ggplot2* for visualization based on the grammar of graphics
 -   *knitr* for dynamic document generation
+-   *scales* for data transformation and visualization
+-   *patchwork* for combining multiple plots
+-   *dplyr* for data manipulation
 
 # Further Suggestions for Interactivity
-
-...
+Since the visualization is intended for a poster, we could include features such as *hover-over tooltips* to display detailed information, *interactive legends* where users could click to highlight specific disaster types and *zoom and pan* to allow users to closely examine selected areas of the visualisation. This enhances user engagement and provides a more interactive experience.
 
 
 # Improved Visualization
@@ -213,5 +217,4 @@ bdd_cost_plot / bdd_freq_plot
 ```
 
 # Conclusion
-
-...
+The revised visualization of billion-dollar disasters in the USA improves clarity and accessibility by separating frequency and cost data, enhancing the color palette, and grouping disaster types. These improvements highlight the increasing impact of the disasters alongside with the escalating costs over the years. By providing a more detailed and visually appealing representation of the data, the revised visualization conveys the urgency for enhanced disaster preparedness.
