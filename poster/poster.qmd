@@ -49,7 +49,7 @@ To highlight the need for enhanced disaster preparedness in the USA, Dottle and 
 # Previous Visualization
 
 ```{r}
-#| label: fig-bb-on-poster
+#| label: fig-previous-visual-on-poster
 #| fig-cap: "Frequency and Estimated Costs of Billion-Dollar Disasters in the
 #| USA by year, published by Bloomberg."
 #| out-width: 100%
@@ -83,16 +83,18 @@ We used the Quarto publication framework and the R programming language, along w
 -   *tidyverse* for data transformation, including *ggplot2* for visualization based on the grammar of graphics
 -   *knitr* for dynamic document generation
 
+# Further Suggestions for Interactivity
+
+...
+
+
 # Improved Visualization
-
-## Estimated Costs of Billion-Dollar Disasters in the USA by Year
-
 ```{r}
-#| label: fig-ggplot
+#| label: fig-improved-visual-on-poster
 #| fig-width: 10
-#| fig-height: 8
-#| fig-cap: "Revised visualization of Estimated Costs of Billion-Dollar
-#| Disasters in the USA by year."
+#| fig-height: 11
+#| fig-cap: "Revised Visualisation of Frequency and Estimated Costs of
+#| Billion-Dollar Disasters in the USA by year."
 #| warning: false
 
 # Plot the estimated costs of billion-dollar disasters in the USA by year
@@ -163,20 +165,8 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
       alpha = 1
     ))
   )
-bdd_cost_plot
-```
 
-## Frequency of Billion-Dollar Disasters in the USA by Year
-
-```{r}
-#| label: fig-ggplot2
-#| fig-width: 10
-#| fig-height: 8
-#| fig-cap: "Revised Visualisation of Frequency of Billion-Dollar Disasters
-#| in the USA by year."
-#| warning: false
-
-# Main plot for combined with year interval
+# Plot the frequency of billion-dollar disasters in the USA by year
 bdd_freq_plot <- ggplot() +
   geom_bar(
     data = bdd_frequency_summary,
@@ -196,6 +186,8 @@ bdd_freq_plot <- ggplot() +
     y = "Frequency",
     caption = "Source: NCEI (2024)\n\n¹CPI-adjusted for inflation"
   ) +
+  scale_fill_manual(values = category_colors) +
+  scale_y_reverse(breaks = seq(0, 100, by = 10), limits = c(100, 0)) +
   theme_minimal() +
   theme(
     plot.caption = element_text(size = 12, margin = margin(t = 10)),
@@ -209,38 +201,11 @@ bdd_freq_plot <- ggplot() +
     axis.text.x = element_blank(),
     panel.grid.minor = element_blank()
   ) +
-  guides(
-    fill = guide_legend(
-      title = "Disaster",
-      title.position = "left",
-      label.position = "right",
-      keywidth = unit(1, "lines"),
-      keyheight = unit(1, "lines")
-    )
-  ) +
-  scale_fill_manual(values = category_colors) +
-  scale_y_reverse(breaks = seq(0, 100, by = 10), limits = c(100, 0)) +
   guides(fill = FALSE)
-bdd_freq_plot
+
+# Display combined plots
+bdd_cost_plot / bdd_freq_plot
 ```
-
-## Combined Plot of Costs and Frequency
-
-```{r}
-#| label: fig-combined-plot
-#| fig-width: 10
-#| fig-height: 10
-#| fig-cap: "Revised Visualisation of Frequency and Estimated Costs of
-#| Billion-Dollar Disasters in the USA by year."
-#| warning: false
-
-combined_plots <- bdd_cost_plot / bdd_freq_plot
-combined_plots
-```
-
-# Further Suggestions for Interactivity
-
-...
 
 # Conclusion
 
