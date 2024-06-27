@@ -119,7 +119,7 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
   geom_point(size = 3) +
   labs(
     x = "Year",
-    y = expression("Estimated Cost (Billion $USD)"^1 * ""),
+    y = "Estimated Cost (Billion $USD)¹",
     color = "Disaster Type",
     title = paste(
       "Frequency and Estimated Costs of Billion-Dollar",
@@ -129,16 +129,21 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    legend.title = element_text(size = 11.5, margin = margin(r = 10)),
+    legend.title = element_text(
+      size = 11.5,
+      margin = margin(r = 12),
+      face = "bold"
+    ),
     legend.text = element_text(size = 11.5),
     legend.position = "top",
     axis.title = element_text(size = 14),
     axis.title.x = element_text(
       size = 14,
       hjust = 1.07,
-      margin = margin(t = -13)
+      margin = margin(t = -13),
+      face = "bold"
     ),
-    axis.title.y = element_text(margin = margin(r = 20)),
+    axis.title.y = element_text(margin = margin(r = 18), face = "bold"),
     axis.text = element_text(size = 12),
     panel.grid.minor = element_blank(),
     plot.margin = unit(c(0, 1.5, 0, 0), "cm")
@@ -196,7 +201,7 @@ bdd_freq_plot <- ggplot() +
     legend.position = "top",
     axis.title = element_text(size = 14),
     axis.title.x = element_blank(),
-    axis.title.y = element_text(margin = margin(r = 20)),
+    axis.title.y = element_text(margin = margin(r = 18), face = "bold"),
     axis.text = element_text(size = 12),
     axis.text.x = element_blank(),
     panel.grid.minor = element_blank()
