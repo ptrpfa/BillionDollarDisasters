@@ -66,8 +66,10 @@ verify_data(bdd_cost)
 
 # Add 5-year intervals
 bdd_cost_summary <- bdd_cost |>
-  mutate(Interval = cut(Year, breaks = seq(1980, max(Year) + 5, by = 5),
-                        right = FALSE, include.lowest = TRUE))
+  mutate(Interval = cut(Year,
+    breaks = seq(1980, max(Year) + 5, by = 5),
+    right = FALSE, include.lowest = TRUE
+  ))
 
 # Create new labels
 new_labels <- gsub("\\[|\\)|\\]", "", levels(bdd_cost_summary$Interval))
@@ -89,7 +91,8 @@ bdd_cost_summary <- bdd_cost_summary |>
 # Set order of categories
 custom_levels <- c("Storm Events", "Dry Weather Events", "Wet Weather Events")
 bdd_cost_summary$Category <- factor(bdd_cost_summary$Category,
-                                    levels = custom_levels)
+  levels = custom_levels
+)
 bdd_cost_summary
 
 # Ensure that there are no missing values or categories
@@ -112,12 +115,15 @@ bdd_cost_combined <- bdd_cost_summary_aggregated |>
   arrange(Interval, Category)
 
 # Set order of categories
-custom_levels <- c("All Events",
-                   "Storm Events",
-                   "Dry Weather Events",
-                   "Wet Weather Events")
+custom_levels <- c(
+  "All Events",
+  "Storm Events",
+  "Dry Weather Events",
+  "Wet Weather Events"
+)
 bdd_cost_combined$Category <- factor(bdd_cost_combined$Category,
-                                     levels = custom_levels)
+  levels = custom_levels
+)
 bdd_cost_combined
 
 # Ensure that there are no missing values or categories
@@ -149,8 +155,10 @@ verify_data(bdd_frequency)
 
 # Add 5-year intervals
 bdd_frequency_summary <- bdd_frequency |>
-  mutate(Interval = cut(Year, breaks = seq(1980, max(Year) + 5, by = 5),
-                        right = FALSE, include.lowest = TRUE))
+  mutate(Interval = cut(Year,
+    breaks = seq(1980, max(Year) + 5, by = 5),
+    right = FALSE, include.lowest = TRUE
+  ))
 
 # Create new labels
 new_labels <- gsub("\\[|\\)|\\]", "", levels(bdd_frequency_summary$Interval))

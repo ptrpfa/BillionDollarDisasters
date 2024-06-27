@@ -3,11 +3,11 @@ title: Visualizing Billion-Dollar Disasters in the USA (1980--2024)
 format:
   poster-typst: 
     size: "33x23" # Approximately A1
-    poster-authors: "Oh Jia Wei Darien, Peter Febrianto Afandy, Quek Joo Wee, Desmond Loy Yong Kiat, Rene Low Yi Xuan, Phileo Teo Weihan"
+    poster-authors: "Oh Jia Wei Darien, Peter Febrianto Afandy, Quek Joo Wee, Desmond Loy Yong Kiat,\n\nRene Low Yi Xuan, Phileo Teo Weihan"
     departments: "SIT-UoG Computing Science"
     institution-logo: "images/sit-logo.png"
-    footer-text: "CSC3107 Project (Team Oldlace)"
-    footer-emails: "2200607, 2200959, 2201046, 2201435, 2202620, 2203179"
+    footer-text: "CSC3107 Project"
+    footer-emails: "2200607@sit.singaporetech.edu.sg, 2200959@sit.singaporetech.edu.sg, 2201046@sit.singaporetech.edu.sg, 2201435@sit.singaporetech.edu.sg, 2202620@sit.singaporetech.edu.sg, 2203179@sit.singaporetech.edu.sg"
 execute:
   echo: false
 knitr:
@@ -119,8 +119,10 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     x = "Year",
     y = expression("Estimated Cost (Billion $USD)"^1 * ""),
     color = "Disaster Type",
-    title = paste("Frequency and Estimated Costs of Billion-Dollar",
-                  "Disasters in the USA (1980-2024)")
+    title = paste(
+      "Frequency and Estimated Costs of Billion-Dollar",
+      "Disasters in the USA (1980-2024)"
+    )
   ) +
   theme_minimal() +
   theme(
@@ -154,10 +156,12 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     shape = "none",
     fill = "none",
     linetype = "none",
-    color = guide_legend(override.aes = list(fill = legend_colors,
-                                             color = NA,
-                                             size = 2,
-                                             alpha = 1))
+    color = guide_legend(override.aes = list(
+      fill = legend_colors,
+      color = NA,
+      size = 2,
+      alpha = 1
+    ))
   )
 bdd_cost_plot
 ```

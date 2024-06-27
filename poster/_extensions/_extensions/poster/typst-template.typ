@@ -55,16 +55,16 @@
   title_column_size: "20",
 
   // Poster title's font size (in pt).
-  title_font_size: "48",
+  title_font_size: "42",
 
   // Authors' font size (in pt).
-  authors_font_size: "36",
+  authors_font_size: "34",
 
   // Footer's URL and email font size (in pt).
-  footer_url_font_size: "30",
+  footer_url_font_size: "28",
 
   // Footer's text font size (in pt).
-  footer_text_font_size: "40",
+  footer_text_font_size: "35",
 
   // The poster's content.
   body
@@ -91,7 +91,7 @@
     margin: 
       (top: 1in, left: 2in, right: 2in, bottom: 2in),
     footer: [
-      #set align(center)
+      #set align(right)
       #set text(32pt, white)
       #block(
         fill: rgb(228,51,44),
@@ -170,6 +170,7 @@
       column-gutter: 0pt,
       row-gutter: 50pt,
       text(title_font_size, title + "\n\n") + 
+      text(authors_font_size, emph("Team Oldlace\n")) + 
       text(authors_font_size, emph(authors) + 
           "   (" + departments + ") "),
       image(univ_logo, width: univ_logo_scale),
