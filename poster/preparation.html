@@ -232,8 +232,8 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 </ol>
 <p><sup>1</sup>Confidence Interval (CI) probabilities represent the uncertainty associated with the particular BDD event’s cost estimate, after Monte Carlo simulations were performed <a href="#references">(Smith &amp; Matthews, 2015)</a>.</p>
 </section>
-<section id="exploratory-data-analysis" class="level1">
-<h1>Exploratory Data Analysis</h1>
+<section id="load-data" class="level1">
+<h1>Load Data</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load time-series dataset</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>bdd_time_series <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/time-series-US-cost-1980-2024.csv"</span>, <span class="at">skip =</span> <span class="dv">2</span>)</span>
@@ -767,6 +767,146 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 </div>
 </div>
 </section>
+</section>
+<section id="exploratory-data-analysis" class="level1">
+<h1>Exploratory Data Analysis</h1>
+<p>The data reveals an increasing trend in both frequency and costs of BDD events over the years. To enable better understanding of the data, we will identify the events that have the highest costs for each category. Subsequently, significant contributing events will be highlighted in our visualisation for better visual understanding.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify peaks in BDD costs (top 5 records for each category)</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>peaks <span class="ot">&lt;-</span> bdd_cost_combined <span class="sc">|&gt;</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Category) <span class="sc">|&gt;</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> Cost, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Category, <span class="fu">desc</span>(Cost))</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>peaks</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 3
+# Groups:   Category [4]
+   Interval  Category            Cost
+   &lt;ord&gt;     &lt;fct&gt;              &lt;dbl&gt;
+ 1 2015-2020 All Events         654. 
+ 2 2020-2024 All Events         571. 
+ 3 2005-2010 All Events         422. 
+ 4 2010-2015 All Events         332. 
+ 5 1990-1995 All Events         194. 
+ 6 2015-2020 Storm Events       506. 
+ 7 2020-2024 Storm Events       424. 
+ 8 2005-2010 Storm Events       356. 
+ 9 2010-2015 Storm Events       223. 
+10 2000-2005 Storm Events       146. 
+11 2020-2024 Dry Weather Events  93.9
+12 2015-2020 Dry Weather Events  82.9
+13 2010-2015 Dry Weather Events  82.8
+14 1985-1990 Dry Weather Events  66.8
+15 1980-1985 Dry Weather Events  49.7
+16 1990-1995 Wet Weather Events  84.8
+17 2015-2020 Wet Weather Events  64.8
+18 2020-2024 Wet Weather Events  53.8
+19 1995-2000 Wet Weather Events  40.7
+20 2010-2015 Wet Weather Events  25.7</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the top intervals</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>peaks <span class="sc">|&gt;</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Category <span class="sc">==</span> <span class="st">"All Events"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 1
+  Interval 
+  &lt;ord&gt;    
+1 2015-2020
+2 2020-2024
+3 2005-2010
+4 2010-2015
+5 1990-1995</code></pre>
+</div>
+</div>
+<p>As observed, the top three 5-year intervals are <code>2015-2020</code>, <code>2020-2024</code> and <code>2005-2010</code> across all categories. Visual analysis of the BDD cost trend over the years also revealed a sudden peak in <code>1990-1995</code>. We will proceed to find the contributing events within these intervals.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add 5-year intervals</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events <span class="ot">&lt;-</span> bdd_events <span class="sc">|&gt;</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Interval =</span> <span class="fu">cut</span>(Year,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1980</span>, <span class="fu">max</span>(Year) <span class="sc">+</span> <span class="dv">5</span>, <span class="at">by =</span> <span class="dv">5</span>),</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">right =</span> <span class="cn">FALSE</span>, <span class="at">include.lowest =</span> <span class="cn">TRUE</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 383 × 11
+   Name                   Disaster Category Deaths  Year `Begin Date` `End Date`
+   &lt;chr&gt;                  &lt;chr&gt;    &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;date&gt;       &lt;date&gt;    
+ 1 Southern Severe Storm… Flooding Wet Wea…      7  1980 1980-04-10   1980-04-17
+ 2 Central/Eastern Droug… Drought  Dry Wea…   1260  1980 1980-06-01   1980-11-30
+ 3 Hurricane Allen (Augu… Tropica… Storm E…     13  1980 1980-08-07   1980-08-11
+ 4 Florida Freeze (Janua… Freeze   Wet Wea…      0  1981 1981-01-12   1981-01-14
+ 5 Severe Storms, Flash … Severe … Storm E…     20  1981 1981-05-05   1981-05-10
+ 6 Midwest/Southeast/Nor… Winter … Wet Wea…     85  1982 1982-01-08   1982-01-16
+ 7 Midwest/Plains/Southe… Severe … Storm E…     33  1982 1982-04-02   1982-04-04
+ 8 Severe Storms (June 1… Severe … Storm E…     30  1982 1982-05-31   1982-06-10
+ 9 Gulf States Storms an… Flooding Wet Wea…     45  1982 1982-12-01   1983-01-15
+10 Western Storms and Fl… Flooding Wet Wea…     50  1982 1982-12-13   1983-03-31
+# ℹ 373 more rows
+# ℹ 4 more variables: `CPI-Adjusted Cost` &lt;dbl&gt;, `Unadjusted Cost` &lt;dbl&gt;,
+#   Summary &lt;chr&gt;, Interval &lt;fct&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new labels</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">[|</span><span class="sc">\\</span><span class="st">)|</span><span class="sc">\\</span><span class="st">]"</span>, <span class="st">""</span>, <span class="fu">levels</span>(bdd_top_cost_events<span class="sc">$</span>Interval))</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">","</span>, <span class="st">"-"</span>, new_labels)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"2025"</span>, <span class="st">"2024"</span>, new_labels)</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  bdd_top_cost_events<span class="sc">$</span>Interval,</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">levels</span>(bdd_top_cost_events<span class="sc">$</span>Interval),</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">ordered =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> new_labels</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Get top 2 events for each interval</span></span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events <span class="ot">&lt;-</span> bdd_top_cost_events <span class="sc">|&gt;</span></span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Interval =</span> new_labels) <span class="sc">|&gt;</span></span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Interval <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"2015-2020"</span>, <span class="st">"2020-2024"</span>, <span class="st">"2005-2010"</span>, <span class="st">"1990-1995"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval, Category, Name, Summary, Deaths, <span class="at">Cost =</span> <span class="st">`</span><span class="at">CPI-Adjusted Cost</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Interval) <span class="sc">|&gt;</span></span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> Cost, <span class="at">n =</span> <span class="dv">2</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Interval, <span class="fu">desc</span>(Cost), Category)</span>
+<span id="cb56-20"><a href="#cb56-20" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 6
+# Groups:   Interval [4]
+  Interval  Category           Name                        Summary Deaths   Cost
+  &lt;ord&gt;     &lt;chr&gt;              &lt;chr&gt;                       &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+1 1990-1995 Storm Events       Hurricane Andrew (August 1… Catego…     61 5.99e4
+2 1990-1995 Wet Weather Events Midwest Flooding (Summer 1… Severe…     48 4.59e4
+3 2005-2010 Storm Events       Hurricane Katrina (August … Catego…   1833 1.99e5
+4 2005-2010 Storm Events       Hurricane Ike (September 2… Catego…    112 4.29e4
+5 2015-2020 Storm Events       Hurricane Harvey (August 2… Catego…     89 1.59e5
+6 2015-2020 Storm Events       Hurricane Maria (September… Catego…   2981 1.14e5
+7 2020-2024 Storm Events       Hurricane Ian (September 2… Ian ma…    152 1.17e5
+8 2020-2024 Storm Events       Hurricane Ida (August 2021) Catego…     96 8.39e4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export dataset into CSV</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(bdd_top_cost_events, <span class="st">"data/significant-events.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As observed, the following events contributed significantly to the abnormally high costs in the previously identified intervals. We will label these events in the visualisation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>Interval,   <span class="sc">~</span>Summary, <span class="sc">~</span>Category,</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1990-1995"</span>, <span class="st">"Hurricane Andrew (1992),</span><span class="sc">\n</span><span class="st">Midwest Flooding (1993)"</span>, <span class="st">"All Events"</span>,</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2005-2010"</span>, <span class="st">"Hurricane Katrina (2005),</span><span class="sc">\n</span><span class="st">Hurricane Ike (2008)"</span>, <span class="st">"All Events"</span>,</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2015-2020"</span>, <span class="st">"Hurricane Harvey (2017),</span><span class="sc">\n</span><span class="st">Hurricane Maria (2017)"</span>, <span class="st">"All Events"</span>,</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2020-2024"</span>, <span class="st">"Hurricane Ida (2021),</span><span class="sc">\n</span><span class="st">Hurricane Ian (2022)"</span>, <span class="st">"All Events"</span></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary <span class="ot">&lt;-</span> bdd_top_cost_summary <span class="sc">|&gt;</span></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(bdd_cost_summary_aggregated, <span class="at">by =</span> <span class="st">"Interval"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval, Cost, <span class="at">Category =</span> Category.x, Summary)</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+  Interval   Cost Category   Summary                                            
+  &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;                                              
+1 1990-1995  194. All Events "Hurricane Andrew (1992),\nMidwest Flooding (1993)"
+2 2005-2010  422. All Events "Hurricane Katrina (2005),\nHurricane Ike (2008)"  
+3 2015-2020  654. All Events "Hurricane Harvey (2017),\nHurricane Maria (2017)" 
+4 2020-2024  571. All Events "Hurricane Ida (2021),\nHurricane Ian (2022)"      </code></pre>
+</div>
+</div>
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>

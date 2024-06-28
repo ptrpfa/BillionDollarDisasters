@@ -101,6 +101,14 @@ Since the visualization is intended for a poster, we could include features such
 #| Billion-Dollar Disasters in the USA by year."
 #| warning: false
 
+# Add custom vjust and hjust values to adjust text position
+bdd_top_cost_summary <- bdd_top_cost_summary |>
+  mutate(
+    custom_vjust = c(-0.85, -0.85, 0.5, 0.5),
+    custom_hjust = c(0.5, 0.5, 1, 1),
+    custom_xnudge = c(0, 0, -0.3, -0.15)
+  )
+
 # Plot the estimated costs of billion-dollar disasters in the USA by year
 bdd_cost_plot <- ggplot(bdd_cost_combined) +
   aes(
@@ -110,17 +118,15 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     group = Category,
     linetype = Category
   ) +
-  # Plot colored area under the overall trend line
-  stat_smooth(
-    data = bdd_cost_summary_aggregated,
-    aes(fill = Category),
-    geom = "area",
-    span = 0.45,
-    alpha = 0.05,
-    linewidth = 0
-  ) +
   stat_smooth(method = "loess", span = 0.5) +
-  geom_point(size = 3) +
+  geom_text(
+    data = bdd_top_cost_summary,
+    aes(label = Summary, vjust = custom_vjust, hjust = custom_hjust),
+    nudge_x = bdd_top_cost_summary$custom_xnudge,
+    size = 2.3,
+    color = "black"
+  ) +
+  geom_point(data = bdd_top_cost_summary, size = 1.8, color = "black") +
   labs(
     x = "Year",
     y = "Estimated Cost (Billion $USD)¹",
@@ -150,7 +156,7 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     axis.title.y = element_text(margin = margin(r = 18), face = "bold"),
     axis.text = element_text(size = 12),
     panel.grid.minor = element_blank(),
-    plot.margin = unit(c(0, 1.5, 0, 0), "cm")
+    plot.margin = unit(c(0, 1.5, 0, 1), "cm")
   ) +
   scale_color_manual(values = category_colors) +
   scale_fill_manual(values = category_colors) +
