@@ -74,6 +74,8 @@ include_graphics("images/bb_bdd_cropped.png")
 ## Data
 -   Frequency and estimated cost for each disaster type is obtained from the National Centers for Environmental Information (NCEI). [^ncei_timeseries] 
 -   Consolidated data with NCEI USA to obtain more detailed information on each disaster specific to the United States.[^ncei_usa]
+-   Combined individual disaster types into broader disaster categories for better visualisation and capturing of trends.
+-   Combined data from each disaster category into 5-year intervals for better visualisation of trends.
 
 [^ncei_timeseries]: <https://www.ncei.noaa.gov/access/billions/time-series>
 [^ncei_usa] : <https://www.ncei.noaa.gov/access/billions/state-summary/US>
@@ -106,7 +108,7 @@ bdd_top_cost_summary <- bdd_top_cost_summary |>
   mutate(
     custom_vjust = c(-0.8, -0.8, 0.5, 0.5),
     custom_hjust = c(0.5, 0.5, 1, 0),
-    custom_xnudge = c(0, 0, -0.3, 0.2)
+    custom_xnudge = c(0, 0, -0.3, 0.18)
   )
 
 # Plot the estimated costs of billion-dollar disasters in the USA by year
@@ -200,7 +202,10 @@ bdd_freq_plot <- ggplot() +
   ) +
   labs(
     y = "Frequency",
-    caption = "Source: NCEI (2024)\n\n¹CPI-adjusted for inflation"
+    caption = paste(
+      "Source: NCEI (2024)\n\n¹Values adjusted for",
+      "inflation using the Consumer Price Index"
+    )
   ) +
   scale_fill_manual(values = category_colors) +
   scale_y_reverse(breaks = seq(0, 100, by = 10), limits = c(100, 0)) +

@@ -55,7 +55,7 @@ Relevant columns for data processing and analysis on each of the three datasets 
     -   `Unadjusted Cost`: The unadjusted cost of the disaster event
     -   `Deaths`: Number of deaths caused by the disaster event
 2.  `time-series-US-cost-1980-2024.csv`
-    -   `State`: US State (redundant)
+    -   `State`: US State
     -   `Year`: Year
     -   `Drought Count`: Total drought events for the year
     -   `Drought Cost`: Total cost of drought events for the year
@@ -294,32 +294,38 @@ new_labels <- factor(
   labels = new_labels
 )
 
-# Get cost of disaster categories for every 5-year interval
+# Get frequency of disaster categories for every 5-year interval
 bdd_frequency_summary <- bdd_frequency_summary |>
   mutate(Interval = new_labels) |>
   group_by(Interval, Category) |>
   summarize(Count = sum(Count, na.rm = TRUE), .groups = "drop")
 bdd_frequency_summary
 
-# Ensure that there are no missing values or categories
-verify_data(bdd_frequency_summary)
-
+# Get frequencies of events for every 5-year interval
 bdd_frequency_total <- bdd_frequency_summary |>
   group_by(Interval) |>
   summarise(TotalCount = sum(Count))
 bdd_frequency_total
 
+# Get frequencies of events for each category
 category_totals <- bdd_frequency_summary |>
   group_by(Category) |>
   summarise(Total = sum(Count)) |>
   arrange(Total)
+category_totals
 
+# Get order of categories
 ordered_categories <- category_totals$Category
 
+# Set order of categories
 bdd_frequency_summary$Category <- factor(
   bdd_frequency_summary$Category,
   levels = ordered_categories
 )
+bdd_frequency_summary
+
+# Ensure that there are no missing values or categories
+verify_data(bdd_frequency_summary)
 ```
 
 ## Process Events Data
@@ -389,36 +395,8 @@ verify_data(bdd_events)
 write_csv(bdd_events, "data/combined-events.csv")
 ```
 
-## Process Combined Events Data
-Get frequency and estimated cost of BDD events by year, which is equivalent to the `bdd_events` and `bdd_frequency` tibbles, but not including categories with values = `0`. This is to enable cross-checking and data verifications to be performed, to ensure that the values in `bdd_events` and `bdd_frequency`, derived from the time series dataset, are accurate and correct.
-```{r}
-#| label: process-combined-events-data
-
-# Get frequency and costs of BDD events by year
-bdd_events_frequency_cost <- bdd_events |>
-  group_by(Year, Disaster) |>
-  summarise(
-    Count = n(),
-    `CPI-Adjusted Cost` = sum(`CPI-Adjusted Cost`, na.rm = TRUE),
-    `Unadjusted Cost` = sum(`Unadjusted Cost`, na.rm = TRUE),
-    .groups = "drop"
-  ) |>
-  mutate(Category = case_when(
-    Disaster %in% names(disaster_mapping) ~ disaster_mapping[Disaster],
-    TRUE ~ "Other"
-  )) |>
-  select(
-    `Year`, `Disaster`, `Category`, `Count`,
-    `CPI-Adjusted Cost`, `Unadjusted Cost`
-  )
-bdd_events_frequency_cost
-
-# Ensure that there are no missing values or categories
-verify_data(bdd_events_frequency_cost)
-```
-
 # Exploratory Data Analysis
-The data reveals an increasing trend in both frequency and costs of BDD events over the years. To enable better understanding of the data, we will identify the events that have the highest costs for each category. Subsequently, significant contributing events will be highlighted in our visualisation for better visual understanding.
+Upon analysis, the data reveals an increasing trend for both frequency and cost of BDD events over the years. To better understand the data, we will identify the events that have the highest costs for each category. Subsequently, these significant contributing events will be highlighted for better understanding and interpretation of the visualisation plotted.
 
 ```{r}
 #| label: data-analysis-top-intervals
@@ -437,18 +415,17 @@ peaks |>
   select(Interval)
 ```
 
-As observed, the top three 5-year intervals are `2015-2020`, `2020-2024` and `2005-2010` across all categories. Visual analysis of the BDD cost trend over the years also revealed a sudden peak in `1990-1995`. We will proceed to find the contributing events within these intervals.
+As observed, the top three 5-year intervals are `2015-2020`, `2020-2024` and `2005-2010` across all categories. Visual analysis of the BDD cost trend over the years also revealed a sudden peak of interest in `1990-1995`. We will proceed to identify the contributing events within these four intervals.
 
 ```{r}
 #| label: data-analysis-top-events
 
-# Add 5-year intervals
+# Add 5-year intervals to events dataset
 bdd_top_cost_events <- bdd_events |>
   mutate(Interval = cut(Year,
     breaks = seq(1980, max(Year) + 5, by = 5),
     right = FALSE, include.lowest = TRUE
   ))
-bdd_top_cost_events
 
 # Create new labels
 new_labels <- gsub("\\[|\\)|\\]", "", levels(bdd_top_cost_events$Interval))
@@ -464,8 +441,12 @@ new_labels <- factor(
 # Get top 2 events for each interval
 bdd_top_cost_events <- bdd_top_cost_events |>
   mutate(Interval = new_labels) |>
-  filter(Interval %in% c("2015-2020", "2020-2024", "2005-2010", "1990-1995")) |>
-  select(Interval, Category, Name, Summary, Deaths, Cost = `CPI-Adjusted Cost`) |>
+  filter(Interval %in% c("2015-2020",
+                         "2020-2024",
+                         "2005-2010",
+                         "1990-1995")) |>
+  select(Interval, Category, Name, Summary,
+         Deaths, Cost = `CPI-Adjusted Cost`) |>
   group_by(Interval) |>
   slice_max(order_by = Cost, n = 2, with_ties = FALSE) |>
   arrange(Interval, desc(Cost), Category)
@@ -475,16 +456,27 @@ bdd_top_cost_events
 write_csv(bdd_top_cost_events, "data/significant-events.csv")
 ```
 
-As observed, the following events contributed significantly to the abnormally high costs in the previously identified intervals. We will label these events in the visualisation.
+Upon analysis, most of the events that contributed significantly to the abnormally high costs in the intervals of interest consist of *Storm* events, such as Hurricane Andrew in 1992 and Hurricane Ida, recently in 2022. We will label these events, including the Midwest Flooding in 1993, the sole *Wet Weather* event, in the visualisation. 
+
+To do so, we create a summarised events data frame to capture these significant events.
+
 ```{r}
 #| label: data-analysis-top-events-summary
 
 bdd_top_cost_summary <- tribble(
   ~Interval,   ~Summary, ~Category,
-  "1990-1995", "Hurricane Andrew (1992),\nMidwest Flooding (1993)", "All Events",
-  "2005-2010", "Hurricane Katrina (2005),\nHurricane Ike (2008)", "All Events",
-  "2015-2020", "Hurricane Harvey (2017),\nHurricane Maria (2017)", "All Events",
-  "2020-2024", "Hurricane Ida (2021),\nHurricane Ian (2022)", "All Events"
+  "1990-1995",
+  "Hurricane Andrew (1992),\nMidwest Flooding (1993)",
+  "All Events",
+  "2005-2010",
+  "Hurricane Katrina (2005),\nHurricane Ike (2008)",
+  "All Events",
+  "2015-2020",
+  "Hurricane Harvey (2017),\nHurricane Maria (2017)",
+  "All Events",
+  "2020-2024",
+  "Hurricane Ida (2021),\nHurricane Ian (2022)",
+  "All Events"
 )
 bdd_top_cost_summary <- bdd_top_cost_summary |>
   left_join(bdd_cost_summary_aggregated, by = "Interval") |>
@@ -493,9 +485,9 @@ bdd_top_cost_summary
 ```
 
 # Conclusion
-The data are now ready for visualization. The next step will be to create a plot that will allow us to visualise the frequency and estimated costs of Billion-Dollar Disasters in the USA from 1980 to 2024.
+The data is now ready for visualization. The next step entails the creation of a combined plot that will enable us to visualise both the frequency and estimated costs of Billion-Dollar Disasters in the USA from 1980 to 2024.
 
 # References {#references}
-NOAA National Centers for Environmental Information (NCEI) U.S. Billion-Dollar Weather and Climate Disasters (2024). https://www.ncei.noaa.gov/access/billions/, DOI: [10.25921/stkw-7w73](https://www.doi.org/10.25921/stkw-7w73). Accessed \[1 June 2024\].
+NOAA National Centers for Environmental Information (NCEI) U.S. Billion-Dollar Weather and Climate Disasters (2024). https://www.ncei.noaa.gov/access/billions, DOI: [10.25921/stkw-7w73](https://www.doi.org/10.25921/stkw-7w73). Accessed \[1 June 2024\].
 
 Smith, A., and J. Matthews, 2015: Quantifying Uncertainty and Variable Sensitivity within the U.S. Billion-dollar Weather and Climate Disaster Cost Estimates. Natural Hazards., DOI: [10.1007/s11069-015-1678-x](https://link.springer.com/article/10.1007/s11069-015-1678-x). Accessed \[1 June 2024\].

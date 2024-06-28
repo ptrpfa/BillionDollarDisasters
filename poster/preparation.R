@@ -171,32 +171,38 @@ new_labels <- factor(
   labels = new_labels
 )
 
-# Get cost of disaster categories for every 5-year interval
+# Get frequency of disaster categories for every 5-year interval
 bdd_frequency_summary <- bdd_frequency_summary |>
   mutate(Interval = new_labels) |>
   group_by(Interval, Category) |>
   summarize(Count = sum(Count, na.rm = TRUE), .groups = "drop")
 bdd_frequency_summary
 
-# Ensure that there are no missing values or categories
-verify_data(bdd_frequency_summary)
-
+# Get frequencies of events for every 5-year interval
 bdd_frequency_total <- bdd_frequency_summary |>
   group_by(Interval) |>
   summarise(TotalCount = sum(Count))
 bdd_frequency_total
 
+# Get frequencies of events for each category
 category_totals <- bdd_frequency_summary |>
   group_by(Category) |>
   summarise(Total = sum(Count)) |>
   arrange(Total)
+category_totals
 
+# Get order of categories
 ordered_categories <- category_totals$Category
 
+# Set order of categories
 bdd_frequency_summary$Category <- factor(
   bdd_frequency_summary$Category,
   levels = ordered_categories
 )
+bdd_frequency_summary
+
+# Ensure that there are no missing values or categories
+verify_data(bdd_frequency_summary)
 
 
 ## -----------------------------------------------------------------------------
@@ -263,32 +269,6 @@ write_csv(bdd_events, "data/combined-events.csv")
 
 
 ## -----------------------------------------------------------------------------
-#| label: process-combined-events-data
-
-# Get frequency and costs of BDD events by year
-bdd_events_frequency_cost <- bdd_events |>
-  group_by(Year, Disaster) |>
-  summarise(
-    Count = n(),
-    `CPI-Adjusted Cost` = sum(`CPI-Adjusted Cost`, na.rm = TRUE),
-    `Unadjusted Cost` = sum(`Unadjusted Cost`, na.rm = TRUE),
-    .groups = "drop"
-  ) |>
-  mutate(Category = case_when(
-    Disaster %in% names(disaster_mapping) ~ disaster_mapping[Disaster],
-    TRUE ~ "Other"
-  )) |>
-  select(
-    `Year`, `Disaster`, `Category`, `Count`,
-    `CPI-Adjusted Cost`, `Unadjusted Cost`
-  )
-bdd_events_frequency_cost
-
-# Ensure that there are no missing values or categories
-verify_data(bdd_events_frequency_cost)
-
-
-## -----------------------------------------------------------------------------
 #| label: data-analysis-top-intervals
 
 # Identify peaks in BDD costs (top 5 records for each category)
@@ -308,13 +288,12 @@ peaks |>
 ## -----------------------------------------------------------------------------
 #| label: data-analysis-top-events
 
-# Add 5-year intervals
+# Add 5-year intervals to events dataset
 bdd_top_cost_events <- bdd_events |>
   mutate(Interval = cut(Year,
     breaks = seq(1980, max(Year) + 5, by = 5),
     right = FALSE, include.lowest = TRUE
   ))
-bdd_top_cost_events
 
 # Create new labels
 new_labels <- gsub("\\[|\\)|\\]", "", levels(bdd_top_cost_events$Interval))
@@ -330,8 +309,12 @@ new_labels <- factor(
 # Get top 2 events for each interval
 bdd_top_cost_events <- bdd_top_cost_events |>
   mutate(Interval = new_labels) |>
-  filter(Interval %in% c("2015-2020", "2020-2024", "2005-2010", "1990-1995")) |>
-  select(Interval, Category, Name, Summary, Deaths, Cost = `CPI-Adjusted Cost`) |>
+  filter(Interval %in% c("2015-2020",
+                         "2020-2024",
+                         "2005-2010",
+                         "1990-1995")) |>
+  select(Interval, Category, Name, Summary,
+         Deaths, Cost = `CPI-Adjusted Cost`) |>
   group_by(Interval) |>
   slice_max(order_by = Cost, n = 2, with_ties = FALSE) |>
   arrange(Interval, desc(Cost), Category)
@@ -346,10 +329,18 @@ write_csv(bdd_top_cost_events, "data/significant-events.csv")
 
 bdd_top_cost_summary <- tribble(
   ~Interval,   ~Summary, ~Category,
-  "1990-1995", "Hurricane Andrew (1992),\nMidwest Flooding (1993)", "All Events",
-  "2005-2010", "Hurricane Katrina (2005),\nHurricane Ike (2008)", "All Events",
-  "2015-2020", "Hurricane Harvey (2017),\nHurricane Maria (2017)", "All Events",
-  "2020-2024", "Hurricane Ida (2021),\nHurricane Ian (2022)", "All Events"
+  "1990-1995",
+  "Hurricane Andrew (1992),\nMidwest Flooding (1993)",
+  "All Events",
+  "2005-2010",
+  "Hurricane Katrina (2005),\nHurricane Ike (2008)",
+  "All Events",
+  "2015-2020",
+  "Hurricane Harvey (2017),\nHurricane Maria (2017)",
+  "All Events",
+  "2020-2024",
+  "Hurricane Ida (2021),\nHurricane Ian (2022)",
+  "All Events"
 )
 bdd_top_cost_summary <- bdd_top_cost_summary |>
   left_join(bdd_cost_summary_aggregated, by = "Interval") |>

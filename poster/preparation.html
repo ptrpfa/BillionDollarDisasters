@@ -151,7 +151,7 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 </ul></li>
 <li><code>time-series-US-cost-1980-2024.csv</code>
 <ul>
-<li><code>State</code>: US State (redundant)</li>
+<li><code>State</code>: US State</li>
 <li><code>Year</code>: Year</li>
 <li><code>Drought Count</code>: Total drought events for the year</li>
 <li><code>Drought Cost</code>: Total cost of drought events for the year</li>
@@ -545,7 +545,7 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 <span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> new_labels</span>
 <span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Get cost of disaster categories for every 5-year interval</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Get frequency of disaster categories for every 5-year interval</span></span>
 <span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>bdd_frequency_summary <span class="ot">&lt;-</span> bdd_frequency_summary <span class="sc">|&gt;</span></span>
 <span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Interval =</span> new_labels) <span class="sc">|&gt;</span></span>
 <span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Interval, Category) <span class="sc">|&gt;</span></span>
@@ -567,15 +567,11 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 10 1995-2000 Dry Weather Events     4
 # ℹ 17 more rows</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure that there are no missing values or categories</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">verify_data</span>(bdd_frequency_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Dataframe is error free</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>bdd_frequency_total <span class="ot">&lt;-</span> bdd_frequency_summary <span class="sc">|&gt;</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Interval) <span class="sc">|&gt;</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">TotalCount =</span> <span class="fu">sum</span>(Count))</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>bdd_frequency_total</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get frequencies of events for every 5-year interval</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>bdd_frequency_total <span class="ot">&lt;-</span> bdd_frequency_summary <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Interval) <span class="sc">|&gt;</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">TotalCount =</span> <span class="fu">sum</span>(Count))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>bdd_frequency_total</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 9 × 2
   Interval  TotalCount
@@ -590,17 +586,50 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 8 2015-2020         75
 9 2020-2024         95</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>category_totals <span class="ot">&lt;-</span> bdd_frequency_summary <span class="sc">|&gt;</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Category) <span class="sc">|&gt;</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Total =</span> <span class="fu">sum</span>(Count)) <span class="sc">|&gt;</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Total)</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>ordered_categories <span class="ot">&lt;-</span> category_totals<span class="sc">$</span>Category</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>bdd_frequency_summary<span class="sc">$</span>Category <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  bdd_frequency_summary<span class="sc">$</span>Category,</span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> ordered_categories</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get frequencies of events for each category</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>category_totals <span class="ot">&lt;-</span> bdd_frequency_summary <span class="sc">|&gt;</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Category) <span class="sc">|&gt;</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Total =</span> <span class="fu">sum</span>(Count)) <span class="sc">|&gt;</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Total)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>category_totals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  Category           Total
+  &lt;chr&gt;              &lt;dbl&gt;
+1 Dry Weather Events    53
+2 Wet Weather Events    77
+3 Storm Events         253</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get order of categories</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>ordered_categories <span class="ot">&lt;-</span> category_totals<span class="sc">$</span>Category</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Set order of categories</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>bdd_frequency_summary<span class="sc">$</span>Category <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  bdd_frequency_summary<span class="sc">$</span>Category,</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> ordered_categories</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>bdd_frequency_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 27 × 3
+   Interval  Category           Count
+   &lt;ord&gt;     &lt;fct&gt;              &lt;dbl&gt;
+ 1 1980-1985 Dry Weather Events     2
+ 2 1980-1985 Storm Events           7
+ 3 1980-1985 Wet Weather Events     7
+ 4 1985-1990 Dry Weather Events     3
+ 5 1985-1990 Storm Events           8
+ 6 1985-1990 Wet Weather Events     6
+ 7 1990-1995 Dry Weather Events     6
+ 8 1990-1995 Storm Events          12
+ 9 1990-1995 Wet Weather Events     8
+10 1995-2000 Dry Weather Events     4
+# ℹ 17 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure that there are no missing values or categories</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">verify_data</span>(bdd_frequency_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Dataframe is error free</code></pre>
+</div>
 </div>
 </section>
 </section>
@@ -609,20 +638,20 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 <section id="base-events" class="level3">
 <h3 class="anchored" data-anchor-id="base-events">Base Events</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert datatype of Begin Date and End Date to dates</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>bdd_base_events <span class="ot">&lt;-</span> bdd_base_events <span class="sc">|&gt;</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">ymd</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">ymd</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>),</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">"%d/%m/%Y"</span>),</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, <span class="st">"%d/%m/%Y"</span>),</span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>)</span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Add disaster subcategory to the base events</span></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>bdd_base_events <span class="ot">&lt;-</span> <span class="fu">add_disaster_category</span>(bdd_base_events)</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>bdd_base_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert datatype of Begin Date and End Date to dates</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>bdd_base_events <span class="ot">&lt;-</span> bdd_base_events <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">ymd</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">ymd</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>),</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">"%d/%m/%Y"</span>),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, <span class="st">"%d/%m/%Y"</span>),</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Add disaster subcategory to the base events</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>bdd_base_events <span class="ot">&lt;-</span> <span class="fu">add_disaster_category</span>(bdd_base_events)</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>bdd_base_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 383 × 8
    Name   Disaster `Begin Date` `End Date` `CPI-Adjusted Cost` `Unadjusted Cost`
@@ -645,20 +674,20 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 <section id="additional-events" class="level3">
 <h3 class="anchored" data-anchor-id="additional-events">Additional Events</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert datatype of Begin Date and End Date to dates</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>bdd_additional_events <span class="ot">&lt;-</span> bdd_additional_events <span class="sc">|&gt;</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>),</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="at">format =</span> <span class="st">"%d/%m/%Y"</span>),</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, <span class="at">format =</span> <span class="st">"%d/%m/%Y"</span>)</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Add disaster subcategory to the additional events, and select relevant columns</span></span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>bdd_additional_events <span class="ot">&lt;-</span></span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_disaster_category</span>(bdd_additional_events) <span class="sc">|&gt;</span></span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Name, <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, Category, Summary)</span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>bdd_additional_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert datatype of Begin Date and End Date to dates</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>bdd_additional_events <span class="ot">&lt;-</span> bdd_additional_events <span class="sc">|&gt;</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">dmy</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>),</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="at">format =</span> <span class="st">"%d/%m/%Y"</span>),</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">End Date</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, <span class="at">format =</span> <span class="st">"%d/%m/%Y"</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Add disaster subcategory to the additional events, and select relevant columns</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>bdd_additional_events <span class="ot">&lt;-</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_disaster_category</span>(bdd_additional_events) <span class="sc">|&gt;</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Name, <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, Category, Summary)</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>bdd_additional_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 383 × 5
    Name                                 `Begin Date` `End Date` Category Summary
@@ -680,20 +709,20 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 <section id="combine-events-data" class="level3">
 <h3 class="anchored" data-anchor-id="combine-events-data">Combine Events Data</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine both events and additional events datasets</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>bdd_events <span class="ot">&lt;-</span> bdd_base_events <span class="sc">|&gt;</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    bdd_additional_events,</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Name"</span>, <span class="st">"Begin Date"</span>, <span class="st">"End Date"</span>, <span class="st">"Category"</span>)</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Name</span><span class="st">`</span>, <span class="st">`</span><span class="at">Disaster</span><span class="st">`</span>, <span class="st">`</span><span class="at">Category</span><span class="st">`</span>, <span class="st">`</span><span class="at">Deaths</span><span class="st">`</span>,</span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Year</span><span class="st">`</span>, <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">CPI-Adjusted Cost</span><span class="st">`</span>,</span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Unadjusted Cost</span><span class="st">`</span>, <span class="st">`</span><span class="at">Summary</span><span class="st">`</span></span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Year</span><span class="st">`</span>, <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">End Date</span><span class="st">`</span>)</span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>bdd_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine both events and additional events datasets</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>bdd_events <span class="ot">&lt;-</span> bdd_base_events <span class="sc">|&gt;</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    bdd_additional_events,</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Name"</span>, <span class="st">"Begin Date"</span>, <span class="st">"End Date"</span>, <span class="st">"Category"</span>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(<span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Name</span><span class="st">`</span>, <span class="st">`</span><span class="at">Disaster</span><span class="st">`</span>, <span class="st">`</span><span class="at">Category</span><span class="st">`</span>, <span class="st">`</span><span class="at">Deaths</span><span class="st">`</span>,</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Year</span><span class="st">`</span>, <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">End Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">CPI-Adjusted Cost</span><span class="st">`</span>,</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Unadjusted Cost</span><span class="st">`</span>, <span class="st">`</span><span class="at">Summary</span><span class="st">`</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Year</span><span class="st">`</span>, <span class="st">`</span><span class="at">Begin Date</span><span class="st">`</span>, <span class="st">`</span><span class="at">End Date</span><span class="st">`</span>)</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>bdd_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 383 × 10
    Name                   Disaster Category Deaths  Year `Begin Date` `End Date`
@@ -712,72 +741,27 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 # ℹ 3 more variables: `CPI-Adjusted Cost` &lt;dbl&gt;, `Unadjusted Cost` &lt;dbl&gt;,
 #   Summary &lt;chr&gt;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure that there are no missing values or categories</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">verify_data</span>(bdd_events)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure that there are no missing values or categories</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">verify_data</span>(bdd_events)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Dataframe is error free</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export combined dataset into CSV</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(bdd_events, <span class="st">"data/combined-events.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export combined dataset into CSV</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(bdd_events, <span class="st">"data/combined-events.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-</section>
-<section id="process-combined-events-data" class="level2">
-<h2 class="anchored" data-anchor-id="process-combined-events-data">Process Combined Events Data</h2>
-<p>Get frequency and estimated cost of BDD events by year, which is equivalent to the <code>bdd_events</code> and <code>bdd_frequency</code> tibbles, but not including categories with values = <code>0</code>. This is to enable cross-checking and data verifications to be performed, to ensure that the values in <code>bdd_events</code> and <code>bdd_frequency</code>, derived from the time series dataset, are accurate and correct.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get frequency and costs of BDD events by year</span></span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>bdd_events_frequency_cost <span class="ot">&lt;-</span> bdd_events <span class="sc">|&gt;</span></span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year, Disaster) <span class="sc">|&gt;</span></span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Count =</span> <span class="fu">n</span>(),</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">CPI-Adjusted Cost</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">CPI-Adjusted Cost</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Unadjusted Cost</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Unadjusted Cost</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Category =</span> <span class="fu">case_when</span>(</span>
-<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>    Disaster <span class="sc">%in%</span> <span class="fu">names</span>(disaster_mapping) <span class="sc">~</span> disaster_mapping[Disaster],</span>
-<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Other"</span></span>
-<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
-<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Year</span><span class="st">`</span>, <span class="st">`</span><span class="at">Disaster</span><span class="st">`</span>, <span class="st">`</span><span class="at">Category</span><span class="st">`</span>, <span class="st">`</span><span class="at">Count</span><span class="st">`</span>,</span>
-<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">CPI-Adjusted Cost</span><span class="st">`</span>, <span class="st">`</span><span class="at">Unadjusted Cost</span><span class="st">`</span></span>
-<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>bdd_events_frequency_cost</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 174 × 6
-    Year Disaster         Category   Count `CPI-Adjusted Cost` `Unadjusted Cost`
-   &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;      &lt;int&gt;               &lt;dbl&gt;             &lt;dbl&gt;
- 1  1980 Drought          Dry Weath…     1              40180.            10020 
- 2  1980 Flooding         Wet Weath…     1               2728.              707.
- 3  1980 Tropical Cyclone Storm Eve…     1               2213.              590 
- 4  1981 Freeze           Wet Weath…     1               2054.              572 
- 5  1981 Severe Storm     Storm Eve…     1               1397               401.
- 6  1982 Flooding         Wet Weath…     2               9684.             3036.
- 7  1982 Severe Storm     Storm Eve…     2               3154.              963.
- 8  1982 Winter Storm     Wet Weath…     1               2191               662 
- 9  1983 Drought          Dry Weath…     1               9456.             2964.
-10  1983 Flooding         Wet Weath…     1               1240               400 
-# ℹ 164 more rows</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure that there are no missing values or categories</span></span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">verify_data</span>(bdd_events_frequency_cost)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Dataframe is error free</code></pre>
-</div>
-</div>
 </section>
 </section>
 <section id="exploratory-data-analysis" class="level1">
 <h1>Exploratory Data Analysis</h1>
-<p>The data reveals an increasing trend in both frequency and costs of BDD events over the years. To enable better understanding of the data, we will identify the events that have the highest costs for each category. Subsequently, significant contributing events will be highlighted in our visualisation for better visual understanding.</p>
+<p>Upon analysis, the data reveals an increasing trend for both frequency and cost of BDD events over the years. To better understand the data, we will identify the events that have the highest costs for each category. Subsequently, these significant contributing events will be highlighted for better understanding and interpretation of the visualisation plotted.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify peaks in BDD costs (top 5 records for each category)</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>peaks <span class="ot">&lt;-</span> bdd_cost_combined <span class="sc">|&gt;</span></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Category) <span class="sc">|&gt;</span></span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> Cost, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Category, <span class="fu">desc</span>(Cost))</span>
-<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>peaks</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify peaks in BDD costs (top 5 records for each category)</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>peaks <span class="ot">&lt;-</span> bdd_cost_combined <span class="sc">|&gt;</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Category) <span class="sc">|&gt;</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> Cost, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Category, <span class="fu">desc</span>(Cost))</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>peaks</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 20 × 3
 # Groups:   Category [4]
@@ -804,11 +788,11 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 19 1995-2000 Wet Weather Events  40.7
 20 2010-2015 Wet Weather Events  25.7</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the top intervals</span></span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>peaks <span class="sc">|&gt;</span></span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Category <span class="sc">==</span> <span class="st">"All Events"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the top intervals</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>peaks <span class="sc">|&gt;</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Category <span class="sc">==</span> <span class="st">"All Events"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 1
   Interval 
@@ -820,53 +804,39 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 5 1990-1995</code></pre>
 </div>
 </div>
-<p>As observed, the top three 5-year intervals are <code>2015-2020</code>, <code>2020-2024</code> and <code>2005-2010</code> across all categories. Visual analysis of the BDD cost trend over the years also revealed a sudden peak in <code>1990-1995</code>. We will proceed to find the contributing events within these intervals.</p>
+<p>As observed, the top three 5-year intervals are <code>2015-2020</code>, <code>2020-2024</code> and <code>2005-2010</code> across all categories. Visual analysis of the BDD cost trend over the years also revealed a sudden peak of interest in <code>1990-1995</code>. We will proceed to identify the contributing events within these four intervals.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add 5-year intervals</span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events <span class="ot">&lt;-</span> bdd_events <span class="sc">|&gt;</span></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Interval =</span> <span class="fu">cut</span>(Year,</span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1980</span>, <span class="fu">max</span>(Year) <span class="sc">+</span> <span class="dv">5</span>, <span class="at">by =</span> <span class="dv">5</span>),</span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">right =</span> <span class="cn">FALSE</span>, <span class="at">include.lowest =</span> <span class="cn">TRUE</span></span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 383 × 11
-   Name                   Disaster Category Deaths  Year `Begin Date` `End Date`
-   &lt;chr&gt;                  &lt;chr&gt;    &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;date&gt;       &lt;date&gt;    
- 1 Southern Severe Storm… Flooding Wet Wea…      7  1980 1980-04-10   1980-04-17
- 2 Central/Eastern Droug… Drought  Dry Wea…   1260  1980 1980-06-01   1980-11-30
- 3 Hurricane Allen (Augu… Tropica… Storm E…     13  1980 1980-08-07   1980-08-11
- 4 Florida Freeze (Janua… Freeze   Wet Wea…      0  1981 1981-01-12   1981-01-14
- 5 Severe Storms, Flash … Severe … Storm E…     20  1981 1981-05-05   1981-05-10
- 6 Midwest/Southeast/Nor… Winter … Wet Wea…     85  1982 1982-01-08   1982-01-16
- 7 Midwest/Plains/Southe… Severe … Storm E…     33  1982 1982-04-02   1982-04-04
- 8 Severe Storms (June 1… Severe … Storm E…     30  1982 1982-05-31   1982-06-10
- 9 Gulf States Storms an… Flooding Wet Wea…     45  1982 1982-12-01   1983-01-15
-10 Western Storms and Fl… Flooding Wet Wea…     50  1982 1982-12-13   1983-03-31
-# ℹ 373 more rows
-# ℹ 4 more variables: `CPI-Adjusted Cost` &lt;dbl&gt;, `Unadjusted Cost` &lt;dbl&gt;,
-#   Summary &lt;chr&gt;, Interval &lt;fct&gt;</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new labels</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">[|</span><span class="sc">\\</span><span class="st">)|</span><span class="sc">\\</span><span class="st">]"</span>, <span class="st">""</span>, <span class="fu">levels</span>(bdd_top_cost_events<span class="sc">$</span>Interval))</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">","</span>, <span class="st">"-"</span>, new_labels)</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"2025"</span>, <span class="st">"2024"</span>, new_labels)</span>
-<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
-<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  bdd_top_cost_events<span class="sc">$</span>Interval,</span>
-<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">levels</span>(bdd_top_cost_events<span class="sc">$</span>Interval),</span>
-<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">ordered =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> new_labels</span>
-<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Get top 2 events for each interval</span></span>
-<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events <span class="ot">&lt;-</span> bdd_top_cost_events <span class="sc">|&gt;</span></span>
-<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Interval =</span> new_labels) <span class="sc">|&gt;</span></span>
-<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Interval <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"2015-2020"</span>, <span class="st">"2020-2024"</span>, <span class="st">"2005-2010"</span>, <span class="st">"1990-1995"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval, Category, Name, Summary, Deaths, <span class="at">Cost =</span> <span class="st">`</span><span class="at">CPI-Adjusted Cost</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
-<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Interval) <span class="sc">|&gt;</span></span>
-<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> Cost, <span class="at">n =</span> <span class="dv">2</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Interval, <span class="fu">desc</span>(Cost), Category)</span>
-<span id="cb56-20"><a href="#cb56-20" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add 5-year intervals to events dataset</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events <span class="ot">&lt;-</span> bdd_events <span class="sc">|&gt;</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Interval =</span> <span class="fu">cut</span>(Year,</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1980</span>, <span class="fu">max</span>(Year) <span class="sc">+</span> <span class="dv">5</span>, <span class="at">by =</span> <span class="dv">5</span>),</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">right =</span> <span class="cn">FALSE</span>, <span class="at">include.lowest =</span> <span class="cn">TRUE</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new labels</span></span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">[|</span><span class="sc">\\</span><span class="st">)|</span><span class="sc">\\</span><span class="st">]"</span>, <span class="st">""</span>, <span class="fu">levels</span>(bdd_top_cost_events<span class="sc">$</span>Interval))</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">","</span>, <span class="st">"-"</span>, new_labels)</span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"2025"</span>, <span class="st">"2024"</span>, new_labels)</span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>new_labels <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a>  bdd_top_cost_events<span class="sc">$</span>Interval,</span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">levels</span>(bdd_top_cost_events<span class="sc">$</span>Interval),</span>
+<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">ordered =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> new_labels</span>
+<span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-18"><a href="#cb53-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-19"><a href="#cb53-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Get top 2 events for each interval</span></span>
+<span id="cb53-20"><a href="#cb53-20" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events <span class="ot">&lt;-</span> bdd_top_cost_events <span class="sc">|&gt;</span></span>
+<span id="cb53-21"><a href="#cb53-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Interval =</span> new_labels) <span class="sc">|&gt;</span></span>
+<span id="cb53-22"><a href="#cb53-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Interval <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"2015-2020"</span>,</span>
+<span id="cb53-23"><a href="#cb53-23" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"2020-2024"</span>,</span>
+<span id="cb53-24"><a href="#cb53-24" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"2005-2010"</span>,</span>
+<span id="cb53-25"><a href="#cb53-25" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"1990-1995"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb53-26"><a href="#cb53-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval, Category, Name, Summary,</span>
+<span id="cb53-27"><a href="#cb53-27" aria-hidden="true" tabindex="-1"></a>         Deaths, <span class="at">Cost =</span> <span class="st">`</span><span class="at">CPI-Adjusted Cost</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb53-28"><a href="#cb53-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Interval) <span class="sc">|&gt;</span></span>
+<span id="cb53-29"><a href="#cb53-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> Cost, <span class="at">n =</span> <span class="dv">2</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb53-30"><a href="#cb53-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Interval, <span class="fu">desc</span>(Cost), Category)</span>
+<span id="cb53-31"><a href="#cb53-31" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_events</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 6
 # Groups:   Interval [4]
@@ -881,22 +851,31 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 7 2020-2024 Storm Events       Hurricane Ian (September 2… Ian ma…    152 1.17e5
 8 2020-2024 Storm Events       Hurricane Ida (August 2021) Catego…     96 8.39e4</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export dataset into CSV</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(bdd_top_cost_events, <span class="st">"data/significant-events.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export dataset into CSV</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(bdd_top_cost_events, <span class="st">"data/significant-events.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>As observed, the following events contributed significantly to the abnormally high costs in the previously identified intervals. We will label these events in the visualisation.</p>
+<p>Upon analysis, most of the events that contributed significantly to the abnormally high costs in the intervals of interest consist of <em>Storm</em> events, such as Hurricane Andrew in 1992 and Hurricane Ida, recently in 2022. We will label these events, including the Midwest Flooding in 1993, the sole <em>Wet Weather</em> event, in the visualisation.</p>
+<p>To do so, we create a summarised events data frame to capture these significant events.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>Interval,   <span class="sc">~</span>Summary, <span class="sc">~</span>Category,</span>
-<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1990-1995"</span>, <span class="st">"Hurricane Andrew (1992),</span><span class="sc">\n</span><span class="st">Midwest Flooding (1993)"</span>, <span class="st">"All Events"</span>,</span>
-<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2005-2010"</span>, <span class="st">"Hurricane Katrina (2005),</span><span class="sc">\n</span><span class="st">Hurricane Ike (2008)"</span>, <span class="st">"All Events"</span>,</span>
-<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2015-2020"</span>, <span class="st">"Hurricane Harvey (2017),</span><span class="sc">\n</span><span class="st">Hurricane Maria (2017)"</span>, <span class="st">"All Events"</span>,</span>
-<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2020-2024"</span>, <span class="st">"Hurricane Ida (2021),</span><span class="sc">\n</span><span class="st">Hurricane Ian (2022)"</span>, <span class="st">"All Events"</span></span>
-<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary <span class="ot">&lt;-</span> bdd_top_cost_summary <span class="sc">|&gt;</span></span>
-<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(bdd_cost_summary_aggregated, <span class="at">by =</span> <span class="st">"Interval"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval, Cost, <span class="at">Category =</span> Category.x, Summary)</span>
-<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>Interval,   <span class="sc">~</span>Summary, <span class="sc">~</span>Category,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1990-1995"</span>,</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hurricane Andrew (1992),</span><span class="sc">\n</span><span class="st">Midwest Flooding (1993)"</span>,</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"All Events"</span>,</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2005-2010"</span>,</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hurricane Katrina (2005),</span><span class="sc">\n</span><span class="st">Hurricane Ike (2008)"</span>,</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"All Events"</span>,</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2015-2020"</span>,</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hurricane Harvey (2017),</span><span class="sc">\n</span><span class="st">Hurricane Maria (2017)"</span>,</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"All Events"</span>,</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2020-2024"</span>,</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hurricane Ida (2021),</span><span class="sc">\n</span><span class="st">Hurricane Ian (2022)"</span>,</span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"All Events"</span></span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary <span class="ot">&lt;-</span> bdd_top_cost_summary <span class="sc">|&gt;</span></span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(bdd_cost_summary_aggregated, <span class="at">by =</span> <span class="st">"Interval"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Interval, Cost, <span class="at">Category =</span> Category.x, Summary)</span>
+<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a>bdd_top_cost_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 4
   Interval   Cost Category   Summary                                            
@@ -910,11 +889,11 @@ Figure&nbsp;1: Frequency and Estimated Costs of Billion-Dollar Disasters in the 
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p>The data are now ready for visualization. The next step will be to create a plot that will allow us to visualise the frequency and estimated costs of Billion-Dollar Disasters in the USA from 1980 to 2024.</p>
+<p>The data is now ready for visualization. The next step entails the creation of a combined plot that will enable us to visualise both the frequency and estimated costs of Billion-Dollar Disasters in the USA from 1980 to 2024.</p>
 </section>
 <section id="references" class="level1">
 <h1>References</h1>
-<p>NOAA National Centers for Environmental Information (NCEI) U.S. Billion-Dollar Weather and Climate Disasters (2024). https://www.ncei.noaa.gov/access/billions/, DOI: <a href="https://www.doi.org/10.25921/stkw-7w73">10.25921/stkw-7w73</a>. Accessed [1 June 2024].</p>
+<p>NOAA National Centers for Environmental Information (NCEI) U.S. Billion-Dollar Weather and Climate Disasters (2024). https://www.ncei.noaa.gov/access/billions, DOI: <a href="https://www.doi.org/10.25921/stkw-7w73">10.25921/stkw-7w73</a>. Accessed [1 June 2024].</p>
 <p>Smith, A., and J. Matthews, 2015: Quantifying Uncertainty and Variable Sensitivity within the U.S. Billion-dollar Weather and Climate Disaster Cost Estimates. Natural Hazards., DOI: <a href="https://link.springer.com/article/10.1007/s11069-015-1678-x">10.1007/s11069-015-1678-x</a>. Accessed [1 June 2024].</p>
 </section>
 
