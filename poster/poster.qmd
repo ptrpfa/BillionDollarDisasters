@@ -104,9 +104,9 @@ Since the visualization is intended for a poster, we could include features such
 # Add custom vjust and hjust values to adjust text position
 bdd_top_cost_summary <- bdd_top_cost_summary |>
   mutate(
-    custom_vjust = c(-0.85, -0.85, 0.5, 0.5),
-    custom_hjust = c(0.5, 0.5, 1, 1),
-    custom_xnudge = c(0, 0, -0.3, -0.15)
+    custom_vjust = c(-0.8, -0.8, 0.5, 0.5),
+    custom_hjust = c(0.5, 0.5, 1, 0),
+    custom_xnudge = c(0, 0, -0.3, 0.2)
   )
 
 # Plot the estimated costs of billion-dollar disasters in the USA by year
@@ -123,7 +123,7 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     data = bdd_top_cost_summary,
     aes(label = Summary, vjust = custom_vjust, hjust = custom_hjust),
     nudge_x = bdd_top_cost_summary$custom_xnudge,
-    size = 2.3,
+    size = 2.8,
     color = "black"
   ) +
   geom_point(data = bdd_top_cost_summary, size = 1.8, color = "black") +
@@ -179,7 +179,8 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
       size = 2,
       alpha = 1
     ))
-  )
+  ) +
+  coord_cartesian(clip = "off")
 
 # Plot the frequency of billion-dollar disasters in the USA by year
 bdd_freq_plot <- ggplot() +
