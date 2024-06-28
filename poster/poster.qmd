@@ -36,6 +36,14 @@ category_colors <- c(
   "Wet Weather Events" = "#1F78B4"
 )
 legend_colors <- c("#6A3D9A", "#33A02C", "#FF7F00", "#1F78B4")
+
+# Define custom labels for the legend
+custom_labels <- c(
+  "All Events" = "All Events¹",
+  "Dry Weather Events" = "Dry Weather Events",
+  "Storm Events" = "Storm Events",
+  "Wet Weather Events" = "Wet Weather Events"
+)
 ```
 
 # Introduction
@@ -128,10 +136,10 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     size = 2.8,
     color = "black"
   ) +
-  geom_point(data = bdd_top_cost_summary, size = 1.8, color = "black") +
+  geom_point(data = bdd_top_cost_summary, size = 1.9, color = "black") +
   labs(
     x = "Year",
-    y = "Estimated Cost (Billion $USD)¹",
+    y = "Estimated Cost (Billion $USD)²",
     color = "Disaster Type",
     title = paste(
       "Frequency and Estimated Costs of Billion-Dollar",
@@ -160,8 +168,7 @@ bdd_cost_plot <- ggplot(bdd_cost_combined) +
     panel.grid.minor = element_blank(),
     plot.margin = unit(c(0, 1.5, 0, 1), "cm")
   ) +
-  scale_color_manual(values = category_colors) +
-  scale_fill_manual(values = category_colors) +
+  scale_color_manual(values = category_colors, labels = custom_labels) +
   scale_linetype_manual(
     values = c(
       "All Events" = "dashed", "Dry Weather Events" = "solid",
@@ -203,8 +210,9 @@ bdd_freq_plot <- ggplot() +
   labs(
     y = "Frequency",
     caption = paste(
-      "Source: NCEI (2024)\n\n¹Values adjusted for",
-      "inflation using the Consumer Price Index"
+      "Source: NCEI (2024)\n\n",
+      "¹Significant contributing events are highlighted in the plot\n\n",
+      "²Values adjusted for inflation using the Consumer Price Index"
     )
   ) +
   scale_fill_manual(values = category_colors) +

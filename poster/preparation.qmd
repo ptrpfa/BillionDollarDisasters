@@ -441,12 +441,16 @@ new_labels <- factor(
 # Get top 2 events for each interval
 bdd_top_cost_events <- bdd_top_cost_events |>
   mutate(Interval = new_labels) |>
-  filter(Interval %in% c("2015-2020",
-                         "2020-2024",
-                         "2005-2010",
-                         "1990-1995")) |>
+  filter(Interval %in% c(
+    "2015-2020",
+    "2020-2024",
+    "2005-2010",
+    "1990-1995"
+  )) |>
   select(Interval, Category, Name, Summary,
-         Deaths, Cost = `CPI-Adjusted Cost`) |>
+    Deaths,
+    Cost = `CPI-Adjusted Cost`
+  ) |>
   group_by(Interval) |>
   slice_max(order_by = Cost, n = 2, with_ties = FALSE) |>
   arrange(Interval, desc(Cost), Category)
@@ -464,7 +468,7 @@ To do so, we create a summarised events data frame to capture these significant 
 #| label: data-analysis-top-events-summary
 
 bdd_top_cost_summary <- tribble(
-  ~Interval,   ~Summary, ~Category,
+  ~Interval, ~Summary, ~Category,
   "1990-1995",
   "Hurricane Andrew (1992),\nMidwest Flooding (1993)",
   "All Events",
