@@ -103,8 +103,11 @@ We used the Quarto publication framework and the R programming language, along w
 -   *dplyr* for data manipulation
 
 # Further Suggestions for Interactivity
-Since the visualization is intended for a poster, we could include features such as *hover-over tooltips* to display detailed information, *interactive legends* where users could click to highlight specific disaster types and *zoom and pan* to allow users to closely examine selected areas of the visualisation. This enhances user engagement and provides a more interactive experience.
-
+- *Hover-over tooltips* to display detailed information
+- *Interactive legends* where users could click to highlight specific disaster types
+- *Zoom and pan* to allow users to closely examine selected areas of the visualisation
+- *Filtering options* to view specific disaster types or time periods
+- *Interactive sliders* to adjust the time range displayed
 
 # Improved Visualization
 ```{r}
