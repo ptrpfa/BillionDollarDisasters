@@ -49,7 +49,5 @@ po/*~
 rsconnect/
 
 # Additional stuff to exclude
-# sample_poster/
-sample_poster/US.14189004.csv
 .DS_Store
 .venv

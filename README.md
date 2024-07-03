@@ -21,7 +21,7 @@ To highlight the need for enhanced disaster preparedness in the USA, Dottle and 
 
 ![BDD Plot](./poster/images/bb_bdd.png)
 
-The plot demonstrated the increased frequency of various types of disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs.
+The plot elucidates the increased frequency and asssociated costs of billion dollar disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs, further highlighting the need for enhanced preparedness by the relevant authorities.
 
 This project is aimed at critiquing and improving the visualisation presented, using a grammar of graphics approach, whilst presenting reasonable justifications. 
 
@@ -31,7 +31,7 @@ Subsequently, the information and visualisations prepared are consolidated into 
 
 ### Dataset and Methodology
 ---
-To conduct analysis on Billion Dollar Disasters, two datasets published by the National Centers for Environmental Information (NCEI) of the United States of America were used [(NCEI, 2024)](#references). An additional dataset derived from the NCEI's [website](https://www.ncei.noaa.gov/access/billions/state-summary/US) via web scraping was also used to provide additional contextual information on individual BDD events.
+To conduct analysis on Billion Dollar Disasters, two datasets published by the National Centers for Environmental Information (NCEI) of the United States of America were used [(NCEI, 2024)](https://www.doi.org/10.25921/stkw-7w73). An additional dataset derived from the NCEI's [website](https://www.ncei.noaa.gov/access/billions/state-summary/US) via web scraping was also used to provide additional contextual information on individual BDD events.
 
 To prepare the dataset for visualisation, a series of data processing steps were undertaken, including aggregating values across 5-year intervals, the creation of custom disaster categories, as well as data cleaning to remove unnecessary values. The data preparation conducted are documented in [`preparation.qmd`](./poster/preparation.qmd)
 

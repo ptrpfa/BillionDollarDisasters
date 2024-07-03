@@ -16,7 +16,7 @@ knitr:
 ---
 
 ```{r}
-#| label: setup
+#| label: set-up
 #| include: false
 
 # Execute data preparations and load graphics
@@ -28,7 +28,7 @@ library(patchwork)
 purl("preparation.qmd")
 source("preparation.R")
 
-# Define custom colors for each category, based on the Paired color palette
+# Define custom colours for each category, based on the Paired colour palette
 category_colors <- c(
   "All Events" = "#6A3D9A",
   "Dry Weather Events" = "#FF7F00",
@@ -48,9 +48,12 @@ custom_labels <- c(
 
 # Introduction
 
-The Disaster Relief Fund (DRF), which is crucial for providing immediate aid and support in the wake of disasters, is being rapidly drained due to the rising number and intensity of these events. This financial strain not only hampers immediate relief efforts but also puts the country at risk of being underprepared for future catastrophes. To highlight the need for enhanced disaster preparedness in the USA, Dottle and Kaufman[^1] presented a combined plot visualizing the total estimated costs by disaster type and the frequency of such events from 1980 to 2023. The plot demonstrated the increased frequency of various types of disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs. Coupled with the depletion of the country's DRF, this elucidates the dire need for proactive preparations and mitigations to address the growing threat of such disasters effectively. 
+According to the Federal Emergency Management Agency of the United States (2024)[^1], the Disaster Relief Fund (DRF), designated for providing financial assistance and relief, is rapidly being depleted due to the increased frequency and severity of disaster events. Resultantly, this financial strain hampers immediate relief efforts and places the country at risk of being under prepared for potential catastrophes in the near future.
 
-[^1]: Dottle, R., & Kaufman, L. (2023). Climate Disasters Drain US Emergency Fund, Adding to Government Shutdown Risk. Retrieved from https://www.bloomberg.com/graphics/2023-fema-disaster-relief-fund-extreme-weather-climate-aid/
+To highlight the need for enhanced disaster preparedness, Dottle and Kaufman[^2] presented a plot visualizing the total estimated costs and frequency of Billion Dollar Disaster (BDD) events by type from 1980 to 2023. The plot demonstrated the increased frequency of various types of disasters over the years, likely driven by factors such as climate change, along with their escalating financial impact and costs. Coupled with the rapid depletion of the DRF, this underscores the pressing need for the USA to undertake proactive preparations and mitigations to effectively address the growing threat of BDDs. 
+
+[^1]: FEMA. (2024). Disaster Relief Fund June Report. Retrieved from: https://www.fema.gov/sites/default/files/documents/fema_june-2024-disaster-relief-fund-report.pdf
+[^2]: Dottle, R., & Kaufman, L. (2023). Climate Disasters Drain US Emergency Fund, Adding to Government Shutdown Risk. Retrieved from https://www.bloomberg.com/graphics/2023-fema-disaster-relief-fund-extreme-weather-climate-aid
 
 # Previous Visualization
 
@@ -65,17 +68,17 @@ include_graphics("images/bb_bdd_cropped.png")
 
 # Strengths
 
--   The graph includes a *dual-axis* representation of the frequency and costs of billion-dollar disasters, providing a comprehensive overview of the data with the use of stacked areas and bars.
+-   The graph includes a *dual-axis* representation of the frequency and costs of Billion-Dollar Disasters, providing a comprehensive overview of the data with the use of stacked areas and bars.
 -   It includes *annotated descriptions* on certain data points, enhancing the interpretability of the visualisation.
--   The timeline shows *clear trends* over the decades, highlighting the increasing frequency and costs of natural disasters.
+-   The timeline shows *clear trends* over the years, highlighting the increasing frequency and costs of natural disasters.
 
 # Suggested Improvements
 
-1.  *Split the visualisation into two separate plots* to better highlight the trends in frequency and costs of billion-dollar disasters.
-2.  *Enhance the color palette* to improve readability and distinguish between different disaster types which caters for color-blind individuals.
+1.  *Split the visualisation into two separate plots* to better highlight the trends in frequency and costs of Billion-Dollar Disasters over the years.
+2.  *Enhance the colour palette* to improve readability and allow readers to better distinguish between different disaster types, catering to colour-blind individuals.
 3.  *Group disaster types* together to provide a clearer overview of the data.
-4.  *Combine data into 5-year intervals* to reduce visual clutter and improve readability.
-5.  *Relabeled axes* to provide clearer information on the data presented.
+4.  *Combine time-series data into 5-year intervals* to reduce visual clutter, improve readability and interpretability.
+5.  *Relabelled axes* to provide clearer information on the data presented.
 6.  *Changed stacked area chart to line chart* to better show trends over time.
 7.  *Included annotation for events* to highlight significant rise of cost.
 8.  *Sorted frequency* and *included trend line* before stacking histogram.
@@ -83,14 +86,13 @@ include_graphics("images/bb_bdd_cropped.png")
 # Implementation
 
 ## Data
--   Frequency and estimated cost for each disaster type is obtained from the National Centers for Environmental Information (NCEI). [^2] 
--   Consolidated data with NCEI USA to obtain more detailed information on each disaster specific to the United States. [^3]
+-   Frequency and estimated cost for each disaster type is obtained from the National Centers for Environmental Information (NCEI). [^3] 
+-   Consolidated data with NCEI USA to obtain more detailed information on each disaster specific to the United States. [^4]
 -   Combined individual disaster types into broader disaster categories for better visualisation and capturing of trends.
 -   Combined data from each disaster category into 5-year intervals for better visualisation of trends.
 
-[^2]: <https://www.ncei.noaa.gov/access/billions/time-series>
-
-[^3]: <https://www.ncei.noaa.gov/access/billions/state-summary/US>
+[^3]: <https://www.ncei.noaa.gov/access/billions/time-series>
+[^4]: <https://www.ncei.noaa.gov/access/billions/state-summary/US>
 
 ## Software
 
@@ -103,7 +105,7 @@ We used the Quarto publication framework and the R programming language, along w
 -   *dplyr* for data manipulation
 
 # Further Suggestions for Interactivity
-- *Hover-over tooltips* to display detailed information
+- *Hover-over tool tips* to display detailed information
 - *Interactive legends* where users could click to highlight specific disaster types
 - *Zoom and pan* to allow users to closely examine selected areas of the visualisation
 - *Filtering options* to view specific disaster types or time periods
@@ -244,4 +246,4 @@ bdd_cost_plot / bdd_freq_plot
 ```
 
 # Conclusion
-The revised visualization of billion-dollar disasters in the USA improves clarity and accessibility by separating frequency and cost data, enhancing the color palette, and grouping disaster types. These improvements highlight the increasing impact of the disasters alongside with the escalating costs over the years. By providing a more detailed and visually appealing representation of the data, the revised visualization conveys the urgency for enhanced disaster preparedness.
+The revised visualization of Billion-Dollar Disasters in the USA improves clarity and accessibility by separating frequency and cost data, enhancing the colour palette, and grouping disaster types. These improvements highlight the increasing impact of the disasters along with the escalating costs over the years. By providing a more detailed and visually appealing representation of the data, the revised visualization conveys the urgency for enhanced disaster preparedness.
